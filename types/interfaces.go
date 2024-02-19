@@ -4,13 +4,20 @@ import (
 	"context"
 )
 
-type SourceType string
+type (
+	SourceType  string
+	LibraryType string
+)
 
-type CollectionLibrary interface {
+const (
+	LibIBLibrary LibraryType = "libib"
+)
+
+type ILibrary interface {
 	GetBooksInCollection() ([]ISBNBook, error)
-	SaveWanted(savePath string, wanted []ISBNBook, withTitle bool) error
+	SaveWanted(wanted []ISBNBook, withTitle bool) error
 }
 
-type CollectionSource interface {
+type ISource interface {
 	GetISBNs(ctx context.Context, series Series) ([]ISBNBook, error)
 }

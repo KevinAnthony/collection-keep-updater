@@ -11,8 +11,8 @@ import (
 )
 
 type App struct {
-	Series []types.Series `json:"series"`
-	LibIB  LibIB          `json:"libib"`
+	Series    []types.Series          `json:"series"`
+	Libraries []types.LibrarySettings `json:"libraries"`
 }
 
 func InitConfig() (App, error) {

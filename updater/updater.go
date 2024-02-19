@@ -3,50 +3,47 @@ package updater
 import (
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 )
 
 type Updater interface {
-	GetAllBooksForSeries(ctx context.Context, series []types.Series) ([]types.ISBNBook, error)
-	GetLibraryBook(ctx context.Context) ([]types.ISBNBook, error)
-	Subtraction(ctx context.Context, library, all []types.ISBNBook) ([]types.ISBNBook, error)
-	SaveWanted(wanted []types.ISBNBook) error
+	GetAllAvailableBooks(ctx context.Context, series []types.Series) ([]types.ISBNBook, error)
+	UpdateLibrary(ctx context.Context, library types.ILibrary, availableBooks []types.ISBNBook) error
 }
 
 type updater struct {
-	source   map[types.SourceType]types.CollectionSource
-	library  types.CollectionLibrary
-	savePath string
+	source map[types.SourceType]types.ISource
 }
 
-func New(library types.CollectionLibrary, source map[types.SourceType]types.CollectionSource) Updater {
+func New(source map[types.SourceType]types.ISource) Updater {
 	return updater{
-		library:  library,
-		source:   source,
-		savePath: "wanted.csv",
+		source: source,
 	}
 }
 
-func (u updater) Subtraction(_ context.Context, library, allPublished []types.ISBNBook) ([]types.ISBNBook, error) {
-	var wanted []types.ISBNBook
-	for _, book := range allPublished {
-		if utils.Contains(library, book, types.ISBNBookCmp) {
-			continue
-		}
-
-		wanted = append(wanted, book)
+func (u updater) UpdateLibrary(_ context.Context, library types.ILibrary, availableBooks []types.ISBNBook) error {
+	booksInLibrary, err := library.GetBooksInCollection()
+	if err != nil {
+		return err
 	}
 
-	return wanted, nil
+	wanted, err := subtraction(booksInLibrary, availableBooks)
+	if err != nil {
+		return err
+	}
+
+	err = u.SaveWanted(library, wanted)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (u updater) GetLibraryBook(_ context.Context) ([]types.ISBNBook, error) {
-	return u.library.GetBooksInCollection()
-}
-
-func (u updater) GetAllBooksForSeries(ctx context.Context, series []types.Series) ([]types.ISBNBook, error) {
+func (u updater) GetAllAvailableBooks(ctx context.Context, series []types.Series) ([]types.ISBNBook, error) {
 	var allBooks []types.ISBNBook
 
 	for _, s := range series {
@@ -60,7 +57,7 @@ func (u updater) GetAllBooksForSeries(ctx context.Context, series []types.Series
 		}
 		books, err := source.GetISBNs(ctx, s)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, s.Name)
 		}
 
 		allBooks = append(allBooks, books...)
@@ -69,12 +66,25 @@ func (u updater) GetAllBooksForSeries(ctx context.Context, series []types.Series
 	return allBooks, nil
 }
 
-func (u updater) SaveWanted(wanted []types.ISBNBook) error {
+func (u updater) SaveWanted(library types.ILibrary, wanted []types.ISBNBook) error {
 	if len(wanted) == 0 {
 		fmt.Println("No New Wanted books")
 
 		return nil
 	}
 
-	return u.library.SaveWanted(u.savePath, wanted, false)
+	return library.SaveWanted(wanted, false)
+}
+
+func subtraction(minuend, subtrahend []types.ISBNBook) ([]types.ISBNBook, error) {
+	var diff []types.ISBNBook
+	for _, book := range subtrahend {
+		if utils.Contains(minuend, book, types.ISBNBookCmp) {
+			continue
+		}
+
+		diff = append(diff, book)
+	}
+
+	return diff, nil
 }

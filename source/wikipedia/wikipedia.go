@@ -17,7 +17,7 @@ type wikiSource struct {
 	client http.Client
 }
 
-func New(client http.Client) types.CollectionSource {
+func New(client http.Client) types.ISource {
 	if client == nil {
 		panic("http client is nil")
 	}

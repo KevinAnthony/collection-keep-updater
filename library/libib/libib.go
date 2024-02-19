@@ -5,28 +5,30 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/gocarina/gocsv"
 )
 
-const exportURL = "https://www.libib.com/settings/export-library/submit"
+const (
+	exportURL   = "https://www.libib.com/settings/export-library/submit"
+	outFileName = "wanted.csv"
+)
 
 type libIB struct {
-	cfg    config.LibIB
+	cfg    types.LibrarySettings
 	client http.Client
 }
 
-func NewLibIB(cfg config.App, c http.Client) types.CollectionLibrary {
+func New(cfg types.LibrarySettings, c http.Client) types.ILibrary {
 	if c == nil {
 		panic("http client is nil")
 	}
 
 	return libIB{
 		client: c,
-		cfg:    cfg.LibIB,
+		cfg:    cfg,
 	}
 }
 
@@ -45,8 +47,8 @@ func (l libIB) GetBooksInCollection() ([]types.ISBNBook, error) {
 	return l.createISBNBook(libibEntries), nil
 }
 
-func (l libIB) SaveWanted(savePath string, wanted []types.ISBNBook, title bool) error {
-	outFile, err := os.Create(savePath)
+func (l libIB) SaveWanted(wanted []types.ISBNBook, title bool) error {
+	outFile, err := os.Create(outFileName)
 	if err != nil {
 		return err
 	}
