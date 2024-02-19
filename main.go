@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/kevinanthony/collection-keep-updater/collection/libib"
 	"github.com/kevinanthony/collection-keep-updater/config"
@@ -22,9 +23,11 @@ func main() {
 	httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
 
 	libibSvc := libib.NewLibIB(cfg, httpClient)
-	wikiDownloader := wikipedia.NewDownloader(httpClient)
+	sources := map[types.SourceType]types.CollectionSource{
+		types.WikipediaSource: wikipedia.New(httpClient),
+	}
 
-	updateSvc := updater.New(libibSvc, wikiDownloader)
+	updateSvc := updater.New(libibSvc, sources)
 
 	if err := run(ctx, cfg, updateSvc); err != nil {
 		panic(err)

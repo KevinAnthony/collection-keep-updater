@@ -4,25 +4,24 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 )
 
 type Updater interface {
-	GetAllBooksForSeries(ctx context.Context, series []config.Series) ([]types.ISBNBook, error)
+	GetAllBooksForSeries(ctx context.Context, series []types.Series) ([]types.ISBNBook, error)
 	GetLibraryBook(ctx context.Context) ([]types.ISBNBook, error)
 	Subtraction(ctx context.Context, library, all []types.ISBNBook) ([]types.ISBNBook, error)
 	SaveWanted(wanted []types.ISBNBook) error
 }
 
 type updater struct {
-	source   types.CollectionSource
+	source   map[types.SourceType]types.CollectionSource
 	library  types.CollectionLibrary
 	savePath string
 }
 
-func New(library types.CollectionLibrary, source types.CollectionSource) Updater {
+func New(library types.CollectionLibrary, source map[types.SourceType]types.CollectionSource) Updater {
 	return updater{
 		library:  library,
 		source:   source,
@@ -47,7 +46,7 @@ func (u updater) GetLibraryBook(_ context.Context) ([]types.ISBNBook, error) {
 	return u.library.GetBooksInCollection()
 }
 
-func (u updater) GetAllBooksForSeries(ctx context.Context, series []config.Series) ([]types.ISBNBook, error) {
+func (u updater) GetAllBooksForSeries(ctx context.Context, series []types.Series) ([]types.ISBNBook, error) {
 	var allBooks []types.ISBNBook
 
 	for _, s := range series {
@@ -55,15 +54,18 @@ func (u updater) GetAllBooksForSeries(ctx context.Context, series []config.Serie
 			continue
 		}
 
-		books, err := u.source.GetISBNs(ctx, s)
+		source, found := u.source[s.Source]
+		if !found {
+			return nil, fmt.Errorf("source: %s is unknown", s.Source)
+
+		}
+		books, err := source.GetISBNs(ctx, s)
 		if err != nil {
 			return nil, err
 		}
 
 		allBooks = append(allBooks, books...)
 	}
-
-	// printList(allBooks)
 
 	return allBooks, nil
 }

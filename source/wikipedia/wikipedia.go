@@ -7,31 +7,34 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/atye/wikitable2json/pkg/client"
 )
 
-type downloader struct {
+type wikiSource struct {
 	client http.Client
 }
 
-func NewDownloader(client http.Client) types.CollectionSource {
+func New(client http.Client) types.CollectionSource {
 	if client == nil {
 		panic("http client is nil")
 	}
 
-	return downloader{
+	return wikiSource{
 		client: client,
 	}
 }
 
-func (l downloader) GetISBNs(ctx context.Context, series config.Series) ([]types.ISBNBook, error) {
+func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) ([]types.ISBNBook, error) {
 	tg := client.NewTableGetter("keep-updater")
+	settings, ok := series.SourceSettings.(types.WikipediaSettings)
+	if !ok {
+		return nil, fmt.Errorf("setting type not correct")
+	}
 
-	tables, err := tg.GetTablesKeyValue(ctx, series.ID, "en", false, 1, series.TableSettings.Table...)
+	tables, err := tg.GetTablesKeyValue(ctx, series.ID, "en", false, 1, settings.Table...)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +42,7 @@ func (l downloader) GetISBNs(ctx context.Context, series config.Series) ([]types
 	books := make([]types.ISBNBook, 0, len(tables))
 	for _, table := range tables {
 		for _, row := range table {
-			book := l.processRow(series, row)
+			book := l.processRow(series, settings, row)
 			if book != nil {
 				books = append(books, *book)
 			}
@@ -48,12 +51,12 @@ func (l downloader) GetISBNs(ctx context.Context, series config.Series) ([]types
 	return books, nil
 }
 
-func (l downloader) processRow(series config.Series, row map[string]string) *types.ISBNBook {
+func (l wikiSource) processRow(series types.Series, settings types.WikipediaSettings, row map[string]string) *types.ISBNBook {
 	book := types.ISBNBook{
-		Volume: l.getVolume(row, series),
-		Title:  l.getTitle(row, series),
-		ISBN10: l.getISBN10(row, series),
-		ISBN13: l.getISBN13(row, series),
+		Volume: l.getVolume(row, settings),
+		Title:  l.getTitle(row, settings),
+		ISBN10: l.getISBN10(row, settings),
+		ISBN13: l.getISBN13(row, settings),
 	}
 
 	if len(book.Title) == 0 {
@@ -67,11 +70,11 @@ func (l downloader) processRow(series config.Series, row map[string]string) *typ
 	return nil
 }
 
-func (l downloader) getVolume(row map[string]string, series config.Series) string {
-	if series.TableSettings.Volume == nil {
+func (l wikiSource) getVolume(row map[string]string, tableSetting types.WikipediaSettings) string {
+	if tableSetting.Volume == nil {
 		return ""
 	}
-	volume, ok := row[*series.TableSettings.Volume]
+	volume, ok := row[*tableSetting.Volume]
 	if !ok {
 		return ""
 	}
@@ -84,11 +87,11 @@ func (l downloader) getVolume(row map[string]string, series config.Series) strin
 	return fmt.Sprintf("%03d", v)
 }
 
-func (l downloader) getTitle(row map[string]string, series config.Series) string {
-	if series.TableSettings.Title == nil {
+func (l wikiSource) getTitle(row map[string]string, tableSetting types.WikipediaSettings) string {
+	if tableSetting.Title == nil {
 		return ""
 	}
-	title, ok := row[*series.TableSettings.Title]
+	title, ok := row[*tableSetting.Title]
 	if !ok {
 		return ""
 	}
@@ -96,12 +99,12 @@ func (l downloader) getTitle(row map[string]string, series config.Series) string
 	return title
 }
 
-func (l downloader) getISBN10(row map[string]string, series config.Series) string {
-	if series.TableSettings.ISBN == nil {
+func (l wikiSource) getISBN10(row map[string]string, tableSetting types.WikipediaSettings) string {
+	if tableSetting.ISBN == nil {
 		return ""
 	}
 
-	isbnStr, ok := row[*series.TableSettings.ISBN]
+	isbnStr, ok := row[*tableSetting.ISBN]
 	if !ok {
 		return ""
 	}
@@ -109,12 +112,12 @@ func (l downloader) getISBN10(row map[string]string, series config.Series) strin
 	return l.regexISBN(isbnStr, types.ISBN10regex, 10)
 }
 
-func (l downloader) getISBN13(row map[string]string, series config.Series) string {
-	if series.TableSettings.ISBN == nil {
+func (l wikiSource) getISBN13(row map[string]string, tableSetting types.WikipediaSettings) string {
+	if tableSetting.ISBN == nil {
 		return ""
 	}
 
-	isbnStr, ok := row[*series.TableSettings.ISBN]
+	isbnStr, ok := row[*tableSetting.ISBN]
 	if !ok {
 		return ""
 	}
@@ -122,7 +125,7 @@ func (l downloader) getISBN13(row map[string]string, series config.Series) strin
 	return l.regexISBN(isbnStr, types.ISBN13regex, 13)
 }
 
-func (l downloader) regexISBN(str string, re *regexp.Regexp, count int) string {
+func (l wikiSource) regexISBN(str string, re *regexp.Regexp, count int) string {
 	if re == nil {
 		return strings.ReplaceAll(str, "-", "")
 	}

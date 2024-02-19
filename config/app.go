@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"github.com/kevinanthony/collection-keep-updater/types"
 	"io"
 	"os"
 
@@ -9,8 +10,8 @@ import (
 )
 
 type App struct {
-	Series []Series `json:"series"`
-	LibIB  LibIB    `json:"libib"`
+	Series []types.Series `json:"series"`
+	LibIB  LibIB          `json:"libib"`
 }
 
 func InitConfig() (App, error) {
