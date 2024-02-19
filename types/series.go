@@ -3,7 +3,9 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/kevinanthony/collection-keep-updater/utils"
+
 	"github.com/pkg/errors"
 )
 

@@ -57,7 +57,6 @@ func (u updater) GetAllBooksForSeries(ctx context.Context, series []types.Series
 		source, found := u.source[s.Source]
 		if !found {
 			return nil, fmt.Errorf("source: %s is unknown", s.Source)
-
 		}
 		books, err := source.GetISBNs(ctx, s)
 		if err != nil {

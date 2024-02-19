@@ -2,9 +2,10 @@ package config
 
 import (
 	"encoding/json"
-	"github.com/kevinanthony/collection-keep-updater/types"
 	"io"
 	"os"
+
+	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/caarlos0/env/v6"
 )

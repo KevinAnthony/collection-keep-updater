@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/kevinanthony/collection-keep-updater/collection/libib"
 	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
+	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/updater"
 	"github.com/kevinanthony/gorps/v2/encoder"
 	"github.com/kevinanthony/gorps/v2/http"
