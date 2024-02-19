@@ -3,10 +3,11 @@ package updater
 import (
 	"context"
 	"fmt"
-	"github.com/pkg/errors"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
+
+	"github.com/pkg/errors"
 )
 
 type Updater interface {
