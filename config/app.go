@@ -5,12 +5,14 @@ import (
 	"io"
 	"os"
 
+	"github.com/kevinanthony/collection-keep-updater/types"
+
 	"github.com/caarlos0/env/v6"
 )
 
 type App struct {
-	Series []Series `json:"series"`
-	LibIB  LibIB    `json:"libib"`
+	Series    []types.Series          `json:"series"`
+	Libraries []types.LibrarySettings `json:"libraries"`
 }
 
 func InitConfig() (App, error) {

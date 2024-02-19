@@ -2,15 +2,22 @@ package types
 
 import (
 	"context"
-
-	"github.com/kevinanthony/collection-keep-updater/config"
 )
 
-type CollectionLibrary interface {
+type (
+	SourceType  string
+	LibraryType string
+)
+
+const (
+	LibIBLibrary LibraryType = "libib"
+)
+
+type ILibrary interface {
 	GetBooksInCollection() ([]ISBNBook, error)
-	SaveWanted(savePath string, wanted []ISBNBook, withTitle bool) error
+	SaveWanted(wanted []ISBNBook, withTitle bool) error
 }
 
-type CollectionSource interface {
-	GetISBNs(ctx context.Context, series config.Series) ([]ISBNBook, error)
+type ISource interface {
+	GetISBNs(ctx context.Context, series Series) ([]ISBNBook, error)
 }
