@@ -27,7 +27,7 @@ func New(client http.Client) types.ISource {
 	}
 }
 
-func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) ([]types.ISBNBook, error) {
+func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
 	if true {
 		return nil, nil
 	}
@@ -43,7 +43,7 @@ func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) ([]types.
 		return nil, err
 	}
 
-	books := make([]types.ISBNBook, 0, len(tables))
+	books := types.NewISBNBooks(len(tables))
 	for _, table := range tables {
 		for _, row := range table {
 			book := l.processRow(series, settings, row)
@@ -104,11 +104,11 @@ func (l wikiSource) getTitle(row map[string]string, tableSetting types.Wikipedia
 }
 
 func (l wikiSource) getISBN10(row map[string]string, tableSetting types.WikipediaSettings) string {
-	if tableSetting.ISBN == nil {
+	if tableSetting.ISBNColumnTitle == nil {
 		return ""
 	}
 
-	isbnStr, ok := row[*tableSetting.ISBN]
+	isbnStr, ok := row[*tableSetting.ISBNColumnTitle]
 	if !ok {
 		return ""
 	}
@@ -117,11 +117,11 @@ func (l wikiSource) getISBN10(row map[string]string, tableSetting types.Wikipedi
 }
 
 func (l wikiSource) getISBN13(row map[string]string, tableSetting types.WikipediaSettings) string {
-	if tableSetting.ISBN == nil {
+	if tableSetting.ISBNColumnTitle == nil {
 		return ""
 	}
 
-	isbnStr, ok := row[*tableSetting.ISBN]
+	isbnStr, ok := row[*tableSetting.ISBNColumnTitle]
 	if !ok {
 		return ""
 	}

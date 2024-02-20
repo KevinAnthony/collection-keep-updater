@@ -52,11 +52,17 @@ func (s *Series) UnmarshalJSON(data []byte) error {
 	case WikipediaSource:
 		settings, err := utils.Unmarshal[WikipediaSettings](raw["source_settings"])
 		if err != nil {
-			return errors.Wrap(err, "unable to unmarshal source_settings")
+			return errors.Wrap(err, "unable to unmarshal source_settings to wikipedia")
 		}
 
 		s.SourceSettings = settings
 	case VizSource:
+		settings, err := utils.Unmarshal[VizSettings](raw["source_settings"])
+		if err != nil {
+			return errors.Wrap(err, "unable to unmarshal source_settings to viz")
+		}
+
+		s.SourceSettings = settings
 	default:
 		return fmt.Errorf("unknown source type: %s", s.Source)
 	}

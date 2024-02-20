@@ -29,7 +29,12 @@ func New(client http.Client) types.ISource {
 	}
 }
 
-func (v viz) GetISBNs(ctx context.Context, series types.Series) ([]types.ISBNBook, error) {
+func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
+	settings, ok := series.SourceSettings.(types.VizSettings)
+	if !ok {
+		return nil, fmt.Errorf("setting type not correct")
+	}
+
 	req, err := http.
 		NewRequest(v.client).
 		Get().
@@ -50,7 +55,14 @@ func (v viz) GetISBNs(ctx context.Context, series types.Series) ([]types.ISBNBoo
 	}
 
 	pages := v.walkSeriesPage(node)
-	books := make([]types.ISBNBook, 0, len(pages))
+	if settings.MaximumBacklog != nil {
+		max := *settings.MaximumBacklog
+		if len(pages) > max {
+			pages = pages[len(pages)-max:]
+		}
+	}
+
+	books := types.NewISBNBooks(len(pages))
 
 	for _, page := range pages {
 		if book, err := v.getBookFromSeriesPage(ctx, series, page); err != nil {
