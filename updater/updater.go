@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
+
 	"github.com/pkg/errors"
 )
 
