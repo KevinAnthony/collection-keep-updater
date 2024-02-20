@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/kevinanthony/collection-keep-updater/types"
-	"github.com/kevinanthony/gorps/v2/http"
-	"golang.org/x/net/html"
 	"strconv"
 	"strings"
+
+	"github.com/kevinanthony/collection-keep-updater/types"
+	"github.com/kevinanthony/gorps/v2/http"
+
+	"golang.org/x/net/html"
 )
 
 const baseURL = "https://www.viz.com"
@@ -56,7 +58,6 @@ func (v viz) GetISBNs(ctx context.Context, series types.Series) ([]types.ISBNBoo
 		} else if book != nil {
 			books = append(books, *book)
 		}
-
 	}
 
 	return books, nil
