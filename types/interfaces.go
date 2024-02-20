@@ -11,6 +11,7 @@ type (
 
 const (
 	LibIBLibrary LibraryType = "libib"
+	VizSource    SourceType  = "viz"
 )
 
 type ILibrary interface {

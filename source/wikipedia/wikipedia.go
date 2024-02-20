@@ -28,6 +28,10 @@ func New(client http.Client) types.ISource {
 }
 
 func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) ([]types.ISBNBook, error) {
+	if true {
+		return nil, nil
+	}
+
 	tg := client.NewTableGetter("keep-updater")
 	settings, ok := series.SourceSettings.(types.WikipediaSettings)
 	if !ok {
