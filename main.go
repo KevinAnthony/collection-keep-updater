@@ -5,6 +5,7 @@ import (
 
 	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/library/libib"
+	"github.com/kevinanthony/collection-keep-updater/source/viz"
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/updater"
@@ -31,6 +32,7 @@ func main() {
 	}
 	sources := map[types.SourceType]types.ISource{
 		types.WikipediaSource: wikipedia.New(httpClient),
+		types.VizSource:       viz.New(httpClient),
 	}
 
 	updateSvc := updater.New(sources)

@@ -56,6 +56,7 @@ func (s *Series) UnmarshalJSON(data []byte) error {
 		}
 
 		s.SourceSettings = settings
+	case VizSource:
 	default:
 		return fmt.Errorf("unknown source type: %s", s.Source)
 	}
