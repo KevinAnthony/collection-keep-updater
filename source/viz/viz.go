@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
+	"github.com/kevinanthony/collection-keep-updater/utils"
 	"github.com/kevinanthony/gorps/v2/http"
 
+	"github.com/pkg/errors"
 	"golang.org/x/net/html"
 )
 
@@ -29,7 +32,12 @@ func New(client http.Client) types.ISource {
 	}
 }
 
-func (v viz) GetISBNs(ctx context.Context, series types.Series) ([]types.ISBNBook, error) {
+func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
+	settings, ok := series.SourceSettings.(types.VizSettings)
+	if !ok {
+		return nil, fmt.Errorf("setting type not correct")
+	}
+
 	req, err := http.
 		NewRequest(v.client).
 		Get().
@@ -50,11 +58,22 @@ func (v viz) GetISBNs(ctx context.Context, series types.Series) ([]types.ISBNBoo
 	}
 
 	pages := v.walkSeriesPage(node)
-	books := make([]types.ISBNBook, 0, len(pages))
+	if settings.MaximumBacklog != nil {
+		max := *settings.MaximumBacklog
+		if len(pages) > max {
+			pages = pages[len(pages)-max:]
+		}
+	}
+
+	books := types.NewISBNBooks(len(pages))
 
 	for _, page := range pages {
+		if settings.Delay != nil {
+			time.Sleep(settings.Delay.Duration)
+		}
+
 		if book, err := v.getBookFromSeriesPage(ctx, series, page); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, page)
 		} else if book != nil {
 			books = append(books, *book)
 		}
@@ -131,7 +150,7 @@ func getVolumeFromPath(path string) string {
 func getISBNFromBody(node *html.Node) string {
 	if node.Type == html.ElementNode && node.Data == "strong" {
 		if isbn := getISBNFromStrong(node); len(isbn) > 0 {
-			return strings.ReplaceAll(isbn, "-", "")
+			return utils.ISBNNormalize(isbn)
 		}
 	}
 

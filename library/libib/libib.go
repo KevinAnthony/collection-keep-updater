@@ -32,7 +32,7 @@ func New(cfg types.LibrarySettings, c http.Client) types.ILibrary {
 	}
 }
 
-func (l libIB) GetBooksInCollection() ([]types.ISBNBook, error) {
+func (l libIB) GetBooksInCollection() (types.ISBNBooks, error) {
 	ctx := context.Background()
 	var libibEntries []libibCSVEntries
 
@@ -47,17 +47,17 @@ func (l libIB) GetBooksInCollection() ([]types.ISBNBook, error) {
 	return l.createISBNBook(libibEntries), nil
 }
 
-func (l libIB) SaveWanted(wanted []types.ISBNBook, title bool) error {
+func (l libIB) SaveWanted(wanted types.ISBNBooks, withTitle bool) error {
 	outFile, err := os.Create(outFileName)
 	if err != nil {
 		return err
 	}
 
-	return gocsv.MarshalFile(l.createCSVEntries(wanted, title), outFile)
+	return gocsv.MarshalFile(l.createCSVEntries(wanted, withTitle), outFile)
 }
 
-func (l libIB) createISBNBook(entries []libibCSVEntries) []types.ISBNBook {
-	books := make([]types.ISBNBook, 0, len(entries))
+func (l libIB) createISBNBook(entries []libibCSVEntries) types.ISBNBooks {
+	books := types.NewISBNBooks(len(entries))
 	for _, entry := range entries {
 		books = append(books, types.ISBNBook{
 			ISBN10: entry.ISBN,
@@ -69,7 +69,7 @@ func (l libIB) createISBNBook(entries []libibCSVEntries) []types.ISBNBook {
 	return books
 }
 
-func (l libIB) createCSVEntries(books []types.ISBNBook, title bool) []libibCSVEntries {
+func (l libIB) createCSVEntries(books types.ISBNBooks, title bool) []libibCSVEntries {
 	entries := make([]libibCSVEntries, 0, len(books))
 	for _, book := range books {
 		entry := libibCSVEntries{

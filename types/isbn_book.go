@@ -1,6 +1,8 @@
 package types
 
-import "strings"
+import (
+	"strings"
+)
 
 type ISBNBook struct {
 	ISBN10  string
@@ -10,7 +12,7 @@ type ISBNBook struct {
 	Volume  string
 }
 
-func ISBNBookCmp(A, B ISBNBook) bool {
+func (A ISBNBook) Equals(B ISBNBook) bool {
 	if len(A.ISBN13) > 0 && len(B.ISBN13) > 0 {
 		return strings.EqualFold(A.ISBN13, B.ISBN13)
 	}

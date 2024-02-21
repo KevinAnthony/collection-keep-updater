@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
+	"github.com/kevinanthony/collection-keep-updater/utils"
 	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/atye/wikitable2json/pkg/client"
@@ -27,7 +28,7 @@ func New(client http.Client) types.ISource {
 	}
 }
 
-func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) ([]types.ISBNBook, error) {
+func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
 	if true {
 		return nil, nil
 	}
@@ -43,7 +44,7 @@ func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) ([]types.
 		return nil, err
 	}
 
-	books := make([]types.ISBNBook, 0, len(tables))
+	books := types.NewISBNBooks(len(tables))
 	for _, table := range tables {
 		for _, row := range table {
 			book := l.processRow(series, settings, row)
@@ -104,11 +105,11 @@ func (l wikiSource) getTitle(row map[string]string, tableSetting types.Wikipedia
 }
 
 func (l wikiSource) getISBN10(row map[string]string, tableSetting types.WikipediaSettings) string {
-	if tableSetting.ISBN == nil {
+	if tableSetting.ISBNColumnTitle == nil {
 		return ""
 	}
 
-	isbnStr, ok := row[*tableSetting.ISBN]
+	isbnStr, ok := row[*tableSetting.ISBNColumnTitle]
 	if !ok {
 		return ""
 	}
@@ -117,11 +118,11 @@ func (l wikiSource) getISBN10(row map[string]string, tableSetting types.Wikipedi
 }
 
 func (l wikiSource) getISBN13(row map[string]string, tableSetting types.WikipediaSettings) string {
-	if tableSetting.ISBN == nil {
+	if tableSetting.ISBNColumnTitle == nil {
 		return ""
 	}
 
-	isbnStr, ok := row[*tableSetting.ISBN]
+	isbnStr, ok := row[*tableSetting.ISBNColumnTitle]
 	if !ok {
 		return ""
 	}
@@ -131,11 +132,11 @@ func (l wikiSource) getISBN13(row map[string]string, tableSetting types.Wikipedi
 
 func (l wikiSource) regexISBN(str string, re *regexp.Regexp, count int) string {
 	if re == nil {
-		return strings.ReplaceAll(str, "-", "")
+		return utils.ISBNNormalize(str)
 	}
 
 	for _, match := range re.FindAllString(str, -1) {
-		isbn := strings.ReplaceAll(match, "-", "")
+		isbn := utils.ISBNNormalize(match)
 		if len(isbn) == count {
 			return isbn
 		}

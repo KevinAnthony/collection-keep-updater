@@ -1,6 +1,8 @@
 package utils
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 func Unmarshal[T any](raw *json.RawMessage) (out T, err error) {
 	if raw == nil {
