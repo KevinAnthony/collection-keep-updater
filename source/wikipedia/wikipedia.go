@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kevinanthony/collection-keep-updater/utils"
+
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
@@ -131,11 +133,11 @@ func (l wikiSource) getISBN13(row map[string]string, tableSetting types.Wikipedi
 
 func (l wikiSource) regexISBN(str string, re *regexp.Regexp, count int) string {
 	if re == nil {
-		return strings.ReplaceAll(str, "-", "")
+		return utils.ISBNNormalize(str)
 	}
 
 	for _, match := range re.FindAllString(str, -1) {
-		isbn := strings.ReplaceAll(match, "-", "")
+		isbn := utils.ISBNNormalize(match)
 		if len(isbn) == count {
 			return isbn
 		}

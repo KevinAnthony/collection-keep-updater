@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kevinanthony/collection-keep-updater/utils"
+
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
@@ -149,7 +151,7 @@ func getVolumeFromPath(path string) string {
 func getISBNFromBody(node *html.Node) string {
 	if node.Type == html.ElementNode && node.Data == "strong" {
 		if isbn := getISBNFromStrong(node); len(isbn) > 0 {
-			return strings.ReplaceAll(isbn, "-", "")
+			return utils.ISBNNormalize(isbn)
 		}
 	}
 
