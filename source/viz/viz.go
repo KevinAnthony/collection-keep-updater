@@ -8,11 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
+	"github.com/pkg/errors"
 	"golang.org/x/net/html"
 )
 
