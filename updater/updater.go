@@ -57,7 +57,7 @@ func (u updater) GetAllAvailableBooks(ctx context.Context, series []types.Series
 		}
 		books, err := source.GetISBNs(ctx, s)
 		if err != nil {
-			return nil, errors.Wrap(err, s.Name)
+			return nil, errors.Wrapf(err, s.Name)
 		}
 
 		allBooks = append(allBooks, books...)

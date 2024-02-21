@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
@@ -65,8 +68,12 @@ func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks
 	books := types.NewISBNBooks(len(pages))
 
 	for _, page := range pages {
+		if settings.Delay != nil {
+			time.Sleep(settings.Delay.Duration)
+		}
+
 		if book, err := v.getBookFromSeriesPage(ctx, series, page); err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, page)
 		} else if book != nil {
 			books = append(books, *book)
 		}
