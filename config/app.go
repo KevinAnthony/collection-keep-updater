@@ -8,6 +8,7 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/caarlos0/env/v6"
+	"github.com/spf13/viper"
 )
 
 type App struct {
@@ -18,7 +19,7 @@ type App struct {
 func InitConfig() (App, error) {
 	var cfg App
 
-	file, err := os.Open("config.json")
+	file, err := os.Open(viper.ConfigFileUsed())
 	if err != nil {
 		return cfg, err
 	}
