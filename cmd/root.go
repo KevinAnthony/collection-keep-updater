@@ -29,8 +29,8 @@ Configure it with different sources and it will compare what you already have li
 )
 
 func Run(cmd *cobra.Command, args []string) error {
-	cfg, err := config.InitConfig()
-	if err != nil {
+	var cfg config.App
+	if err := viper.Unmarshal(&cfg, types.SeriesConfigHookFunc()); err != nil {
 		return err
 	}
 

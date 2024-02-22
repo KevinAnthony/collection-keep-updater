@@ -1,0 +1,122 @@
+---
+series:
+  - name: One Piece
+    id: one-piece
+    source: viz
+    source_settings:
+      maximum_backlog: 2
+      delay_between: 100ms
+  - name: Miss Kobayashi's Dragon Maid
+    id: List_of_Miss_Kobayashi's_Dragon_Maid_chapters
+    source: wikipedia
+    source_settings:
+      volume: No.
+      isbn_column_title: English ISBN
+      tables:
+        - 0
+  - name: 'Miss Kobayashi''s Dragon Maid: Kanna''s Daily Life'
+    id: List_of_Miss_Kobayashi's_Dragon_Maid_chapters
+    source: wikipedia
+    source_settings:
+      volume: No.
+      isbn_column_title: English ISBN
+      tables:
+        - 1
+  - name: 'Miss Kobayashi''s Dragon Maid: Elma''s Office Lady Diary'
+    id: List_of_Miss_Kobayashi's_Dragon_Maid_chapters
+    source: wikipedia
+    source_settings:
+      volume: No.
+      isbn_column_title: English ISBN
+      tables:
+        - 2
+  - name: 'Miss Kobayashi''s Dragon Maid: Fafnir the Recluse'
+    id: List_of_Miss_Kobayashi's_Dragon_Maid_chapters
+    source: wikipedia
+    source_settings:
+      volume: No.
+      isbn_column_title: English ISBN
+      tables:
+        - 4
+  - name: 'Zom 100: Bucket List of the Dead'
+    id: zom-100-bucket-list-of-the-dead
+    source: viz
+    source_settings:
+      maximum_backlog: 2
+      delay_between: 100ms
+  - name: Chainsaw man
+    id: chainsaw-man
+    source: viz
+    source_settings:
+      maximum_backlog: 2
+      delay_between: 100ms
+  - name: Accel World
+    id: Accel_World
+    source: wikipedia
+    source_settings:
+      volume: No.
+      title: Title
+      isbn_column_title: English release date
+      tables:
+        - 0
+  - name: So I'm a Spider, So What?
+    id: So_I'm_a_Spider,_So_What?
+    source: wikipedia
+    source_settings:
+      volume: No.
+      isbn_column_title: English ISBN
+      tables:
+        - 0
+  - name: Bocchi the Rock!
+    id: Bocchi_the_Rock!
+    source: wikipedia
+    source_settings:
+      volume: No.
+      isbn_column_title: English ISBN
+  - name: Is It Wrong to Try to Pick Up Girls in a Dungeon?
+    id: List_of_Is_It_Wrong_to_Try_to_Pick_Up_Girls_in_a_Dungeon?_light_novels
+    source: wikipedia
+    source_settings:
+      volume: No.
+      isbn_column_title: English ISBN
+      tables:
+        - 0
+  - name: Is It Wrong to Try to Pick Up Girls in a Dungeon? - Familia Chronicle
+    id: List_of_Is_It_Wrong_to_Try_to_Pick_Up_Girls_in_a_Dungeon?_light_novels
+    source: wikipedia
+    source_settings:
+      volume: No.
+      title: Title
+      isbn_column_title: English release date
+      tables:
+        - 1
+  - name: Is It Wrong to Try to Pick Up Girls in a Dungeon? - Sword_Oratoria
+    id: Sword_Oratoria
+    source: wikipedia
+    source_settings:
+      volume: No.
+      isbn_column_title: English ISBN
+      tables:
+        - 0
+  - name: Overlord
+    id: Overlord_(novel_series)
+    source: wikipedia
+    source_settings:
+      volume: No.
+      title: Title
+      isbn_column_title: English release date
+      tables:
+        - 0
+  - name: Kaiju No. 8
+    id: kaiju-no-8
+    source: viz
+    source_settings:
+      maximum_backlog: 2
+      delay_between: 100ms
+libraries:
+  - type: libib
+    wanted_collection_id: '1807273'
+    other_collection_ids:
+      - '1807272'
+    api_key: libiblc=eyJpdiI6IlJ0K2t5bkMxTGxpR1RnV2oiLCJ0YWciOiJyK0lMeWx4UWs1KzhXRFZmckVLR3lBPT0iLCJjaXBoZXJ0ZXh0IjoiT0VSd1NXVjNlVGhqVkdGUVFXaENSMEZwVTNkM1ZIUkZWelp4YVhsVWNITTJaRVp3ZG5KVlUyRkdaM2szT0RCVlVVaGxjVnB3T0V0NGRHaEJiRXBZTmtGS1RFeHBXbTFVZUdsVU9FNWpaRUZzY0dObmFFTkdLdz09In0%3D;
+      PHPSESSID=709769653695b96ffca1e788a26d2a50
