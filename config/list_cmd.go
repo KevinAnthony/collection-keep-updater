@@ -13,14 +13,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	listCmd = &cobra.Command{
-		Use:   "list",
-		Short: "list one or all configurations",
-		RunE:  RunList,
-		Args:  ValidateListArgs,
-	}
-)
+var listCmd = &cobra.Command{
+	Use:   "list",
+	Short: "list one or all configurations",
+	RunE:  RunList,
+	Args:  ValidateListArgs,
+}
 
 func ValidateListArgs(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
