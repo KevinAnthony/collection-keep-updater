@@ -33,7 +33,7 @@ func New(client http.Client) types.ISource {
 }
 
 func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
-	settings, ok := series.SourceSettings.(types.VizSettings)
+	settings, ok := series.SourceSettings.(*types.VizSettings)
 	if !ok {
 		return nil, fmt.Errorf("setting type not correct")
 	}
@@ -69,7 +69,7 @@ func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks
 
 	for _, page := range pages {
 		if settings.Delay != nil {
-			time.Sleep(settings.Delay.Duration)
+			time.Sleep(*settings.Delay)
 		}
 
 		if book, err := v.getBookFromSeriesPage(ctx, series, page); err != nil {

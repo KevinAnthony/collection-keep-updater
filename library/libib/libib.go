@@ -102,7 +102,7 @@ func (l libIB) getCSV(ctx context.Context, libraryID string) ([]libibCSVEntries,
 
 	body, err := l.client.Do(req)
 	if err != nil {
-		fmt.Println(err)
+		// TODO: log error
 		return nil, err
 	}
 

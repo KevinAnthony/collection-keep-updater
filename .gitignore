@@ -23,3 +23,5 @@ vendor/
 go.work
 
 config.json
+config.yaml
+config.toml
