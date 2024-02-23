@@ -13,18 +13,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	listCmd = &cobra.Command{
-		Use:   "list",
-		Short: "list one or all configurations",
-		RunE:  RunList,
-		Args:  ValidateArgs,
-	}
-	series  bool
-	library bool
-)
+var listCmd = &cobra.Command{
+	Use:   "list",
+	Short: "list one or all configurations",
+	RunE:  RunList,
+	Args:  ValidateListArgs,
+}
 
-func ValidateArgs(cmd *cobra.Command, args []string) error {
+func ValidateListArgs(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		if series == library {
 			return errors.New("configuration name given but no single configuration type set")
@@ -122,9 +118,4 @@ func printLibraryBasic(cmd *cobra.Command, cfg types.Config) error {
 	t.Render()
 
 	return nil
-}
-
-func init() {
-	listCmd.Flags().BoolVarP(&series, "series", "s", false, "List one or all series configurations")
-	listCmd.Flags().BoolVarP(&library, "library", "l", false, "List one or all library configurations")
 }

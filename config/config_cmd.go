@@ -9,6 +9,14 @@ var Cmd = &cobra.Command{
 	Short: "Manage configurations",
 }
 
+var (
+	series  bool
+	library bool
+)
+
 func init() {
+	Cmd.PersistentFlags().BoolVarP(&series, "series", "s", false, "List one or all series configurations")
+	Cmd.PersistentFlags().BoolVarP(&library, "library", "l", false, "List one or all library configurations")
+
 	Cmd.AddCommand(listCmd, addCmd, removeCmd)
 }
