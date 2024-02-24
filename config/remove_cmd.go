@@ -27,7 +27,7 @@ func validateRemoveArgs(cmd *cobra.Command, args []string) error {
 }
 
 func runRemove(cmd *cobra.Command, args []string) error {
-	cfg, err := ctxu.GetConfigCtx(cmd)
+	cfg, err := ctxu.GetConfig(cmd)
 	if err != nil {
 		return err
 	}
@@ -35,9 +35,9 @@ func runRemove(cmd *cobra.Command, args []string) error {
 	settingsKey := args[0]
 
 	switch {
-	case series:
+	case isSeries:
 		return removeSeries(cfg, settingsKey)
-	case library:
+	case isLibrary:
 		return removeLibrary(cfg, settingsKey)
 	default:
 		return errors.New("unknown configuration type")

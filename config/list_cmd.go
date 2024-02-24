@@ -25,15 +25,15 @@ func runList(cmd *cobra.Command, args []string) error {
 		settingsKey = args[0]
 	}
 
-	cfg, err := ctxu.GetConfigCtx(cmd)
+	cfg, err := ctxu.GetConfig(cmd)
 	if err != nil {
 		return err
 	}
 
 	switch {
-	case series:
+	case isSeries:
 		return printSeries(cmd, cfg, settingsKey)
-	case library:
+	case isLibrary:
 		return printLibrary(cmd, cfg, settingsKey)
 	default:
 		return errors.New("list: reached default branch, shouldn't have")
