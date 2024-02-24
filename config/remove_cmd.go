@@ -14,24 +14,20 @@ import (
 var removeCmd = &cobra.Command{
 	Use:   "remove",
 	Short: "Remove a configuration",
-	RunE:  RunRemove,
-	Args:  ValidateRemoveArgs,
+	RunE:  runRemove,
+	Args:  validateRemoveArgs,
 }
 
-func ValidateRemoveArgs(cmd *cobra.Command, args []string) error {
+func validateRemoveArgs(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
 		return errors.New("remove: key not provided")
-	}
-
-	if series == library || (!series && !library) {
-		return errors.New("remove: no single configuration type set")
 	}
 
 	return nil
 }
 
-func RunRemove(cmd *cobra.Command, args []string) error {
-	cfg, err := ctxu.GetConfigCtx(cmd)
+func runRemove(cmd *cobra.Command, args []string) error {
+	cfg, err := ctxu.GetConfig(cmd)
 	if err != nil {
 		return err
 	}
@@ -39,9 +35,9 @@ func RunRemove(cmd *cobra.Command, args []string) error {
 	settingsKey := args[0]
 
 	switch {
-	case series:
+	case isSeries:
 		return removeSeries(cfg, settingsKey)
-	case library:
+	case isLibrary:
 		return removeLibrary(cfg, settingsKey)
 	default:
 		return errors.New("unknown configuration type")

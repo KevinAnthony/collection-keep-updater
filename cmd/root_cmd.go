@@ -3,13 +3,8 @@ package cmd
 import (
 	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
-	"github.com/kevinanthony/collection-keep-updater/library/libib"
-	"github.com/kevinanthony/collection-keep-updater/source/viz"
-	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/updater"
-	"github.com/kevinanthony/gorps/v2/encoder"
-	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,29 +30,26 @@ func LoadConfig(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	ctxu.SetConfigCtx(cmd, cfg)
+	ctxu.SetConfig(cmd, cfg)
+	ctxu.SetDI(cmd, cfg)
 
 	return nil
 }
 
 func Run(cmd *cobra.Command, args []string) error {
-	cfg, err := ctxu.GetConfigCtx(cmd)
+	cfg, err := ctxu.GetConfig(cmd)
 	if err != nil {
 		return err
 	}
 
-	httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
-
-	libraries := map[types.LibraryType]types.ILibrary{}
-	for _, setting := range cfg.Libraries {
-		switch setting.Name {
-		case types.LibIBLibrary:
-			libraries[types.LibIBLibrary] = libib.New(setting, httpClient)
-		}
+	libraries, err := ctxu.GetLibraries(cmd)
+	if err != nil {
+		return err
 	}
-	sources := map[types.SourceType]types.ISource{
-		types.WikipediaSource: wikipedia.New(httpClient),
-		types.VizSource:       viz.New(httpClient),
+
+	sources, err := ctxu.GetSources(cmd)
+	if err != nil {
+		return err
 	}
 
 	updateSvc := updater.New(sources)
@@ -84,7 +76,7 @@ func Execute() error {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.AddCommand(config.Cmd)
+	rootCmd.AddCommand(config.GetCmd())
 }
 
 func initConfig() {

@@ -1,6 +1,7 @@
 package types
 
 import (
+	"errors"
 	"reflect"
 
 	"github.com/kevinanthony/collection-keep-updater/out"
@@ -11,17 +12,25 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	seriesNameFlag      = "name"
+	seriesKeyFlag       = "key"
+	seriesURLFlag       = "url"
+	seriesSourceFlag    = "source"
+	seriesBlacklistFlag = "blacklist"
+)
+
 type ISourceSettings interface {
 	Print(cmd *cobra.Command) error
 }
 
 type Series struct {
-	Name           string          `json:"name"            mapstructure:"name"`
-	ID             string          `json:"id"              mapstructure:"id"`
-	ISBNBlacklist  []string        `json:"isbn_blacklist"  mapstructure:"isbn_blacklist"`
-	Source         SourceType      `json:"source"          mapstructure:"source"`
-	SourceSettings ISourceSettings `json:"source_settings" mapstructure:"source_settings"`
-	Key            string          `json:"key"             mapstructure:"key"`
+	Name           string          `json:"name"            mapstructure:"name"            yaml:"name"`
+	ID             string          `json:"id"              mapstructure:"id"              yaml:"id"`
+	ISBNBlacklist  []string        `json:"isbn_blacklist"  mapstructure:"isbn_blacklist"  yaml:"isbn_blacklist"`
+	Source         SourceType      `json:"source"          mapstructure:"source"          yaml:"source"`
+	SourceSettings ISourceSettings `json:"source_settings" mapstructure:"source_settings" yaml:"source_settings"`
+	Key            string          `json:"key"             mapstructure:"key"             yaml:"key"`
 }
 
 func (s Series) Print(cmd *cobra.Command) error {
@@ -46,6 +55,45 @@ func (s Series) Print(cmd *cobra.Command) error {
 	}
 
 	return nil
+}
+
+var (
+	seriesNameV      string
+	seriesKeyV       string
+	seriesURLV       string
+	seriesSourceV    string
+	seriesBlacklistV []string
+)
+
+func SeriesSetFlags(cmd *cobra.Command) {
+	wikipediaSetFlags(cmd)
+	vizSetFlags(cmd)
+
+	cmd.Flags().StringVar(&seriesNameV, seriesNameFlag, "", "name of the series.")
+	cmd.Flags().StringVar(&seriesKeyV, seriesKeyFlag, "", "unique key of the series.")
+	cmd.Flags().StringVar(&seriesURLV, seriesURLFlag, "", "url to be parsed for the series, extracting the ID.")
+	cmd.Flags().StringVar(&seriesSourceV, seriesSourceFlag, "", "type of source to be added. [viz, wikipieda]")
+	cmd.Flags().StringArrayVar(&seriesBlacklistV, seriesBlacklistFlag, []string{}, "list of ISBNs to be ignored.")
+}
+
+func NewSeriesConfig(cmd *cobra.Command) (Series, error) {
+	return SeriesConfigFromFlags(cmd, Series{})
+}
+
+func SeriesConfigFromFlags(cmd *cobra.Command, series Series) (Series, error) {
+	series.Name = getFlagOrNil[string](cmd, seriesNameFlag, seriesNameV)
+	series.Key = getFlagOrNil[string](cmd, seriesKeyFlag, seriesKeyV)
+	series.Source = SourceType(getFlagOrNil[string](cmd, seriesSourceFlag, seriesSourceV))
+	series.ISBNBlacklist = getFlagOrNil[[]string](cmd, seriesBlacklistFlag, seriesBlacklistV)
+
+	switch series.Source {
+	case WikipediaSource:
+		return wikiConfigFromFlags(cmd, series)
+	case VizSource:
+		return vizConfigFromFlags(cmd, series)
+	default:
+		return series, errors.New("unknown/unset source.  source is required")
+	}
 }
 
 func SeriesConfigHookFunc() viper.DecoderConfigOption {

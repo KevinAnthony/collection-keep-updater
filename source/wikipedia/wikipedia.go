@@ -29,12 +29,8 @@ func New(client http.Client) types.ISource {
 }
 
 func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
-	if true {
-		return nil, nil
-	}
-
 	tg := client.NewTableGetter("keep-updater")
-	settings, ok := series.SourceSettings.(types.WikipediaSettings)
+	settings, ok := series.SourceSettings.(*types.WikipediaSettings)
 	if !ok {
 		return nil, fmt.Errorf("setting type not correct")
 	}
@@ -47,7 +43,7 @@ func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.IS
 	books := types.NewISBNBooks(len(tables))
 	for _, table := range tables {
 		for _, row := range table {
-			book := l.processRow(series, settings, row)
+			book := l.processRow(series, *settings, row)
 			if book != nil {
 				books = append(books, *book)
 			}
@@ -76,10 +72,10 @@ func (l wikiSource) processRow(series types.Series, settings types.WikipediaSett
 }
 
 func (l wikiSource) getVolume(row map[string]string, tableSetting types.WikipediaSettings) string {
-	if tableSetting.Volume == nil {
+	if tableSetting.VolumeHeader == nil {
 		return ""
 	}
-	volume, ok := row[*tableSetting.Volume]
+	volume, ok := row[*tableSetting.VolumeHeader]
 	if !ok {
 		return ""
 	}
@@ -93,10 +89,10 @@ func (l wikiSource) getVolume(row map[string]string, tableSetting types.Wikipedi
 }
 
 func (l wikiSource) getTitle(row map[string]string, tableSetting types.WikipediaSettings) string {
-	if tableSetting.Title == nil {
+	if tableSetting.TitleHeader == nil {
 		return ""
 	}
-	title, ok := row[*tableSetting.Title]
+	title, ok := row[*tableSetting.TitleHeader]
 	if !ok {
 		return ""
 	}
@@ -105,11 +101,11 @@ func (l wikiSource) getTitle(row map[string]string, tableSetting types.Wikipedia
 }
 
 func (l wikiSource) getISBN10(row map[string]string, tableSetting types.WikipediaSettings) string {
-	if tableSetting.ISBNColumnTitle == nil {
+	if tableSetting.ISBNHeader == nil {
 		return ""
 	}
 
-	isbnStr, ok := row[*tableSetting.ISBNColumnTitle]
+	isbnStr, ok := row[*tableSetting.ISBNHeader]
 	if !ok {
 		return ""
 	}
@@ -118,11 +114,11 @@ func (l wikiSource) getISBN10(row map[string]string, tableSetting types.Wikipedi
 }
 
 func (l wikiSource) getISBN13(row map[string]string, tableSetting types.WikipediaSettings) string {
-	if tableSetting.ISBNColumnTitle == nil {
+	if tableSetting.ISBNHeader == nil {
 		return ""
 	}
 
-	isbnStr, ok := row[*tableSetting.ISBNColumnTitle]
+	isbnStr, ok := row[*tableSetting.ISBNHeader]
 	if !ok {
 		return ""
 	}
