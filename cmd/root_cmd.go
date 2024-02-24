@@ -84,7 +84,7 @@ func Execute() error {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.AddCommand(config.Cmd)
+	rootCmd.AddCommand(config.GetCmd())
 }
 
 func initConfig() {

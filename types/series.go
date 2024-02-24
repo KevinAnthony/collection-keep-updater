@@ -48,6 +48,25 @@ func (s Series) Print(cmd *cobra.Command) error {
 	return nil
 }
 
+const (
+	seriesNameFlag   = "name"
+	seriesKeyFlag    = "key"
+	seriesIDFlag     = "url"
+	seriesSourceFlag = "source"
+	seriesBlacklist  = "blacklist"
+)
+
+func SeriesSetFlags(cmd *cobra.Command) {
+	//WikipediaSetFlags(cmd)
+	//VisSetFlags(cmd)
+
+	cmd.PersistentFlags().String(seriesNameFlag, "", "name of the series.")
+	cmd.PersistentFlags().String(seriesKeyFlag, "", "unique key of the series.")
+	cmd.PersistentFlags().String(seriesIDFlag, "", "url to be parsed for the series, extracting the ID.")
+	cmd.PersistentFlags().String(seriesSourceFlag, "", "type of source to be added. [viz,wikipieda]")
+	cmd.PersistentFlags().StringArray(seriesBlacklist, []string{}, "name of the series.")
+}
+
 func SeriesConfigHookFunc() viper.DecoderConfigOption {
 	return viper.DecodeHook(func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
 		if f.Kind() != reflect.Map {

@@ -16,21 +16,10 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list one or all configurations",
-	RunE:  RunList,
-	Args:  ValidateListArgs,
+	RunE:  runList,
 }
 
-func ValidateListArgs(cmd *cobra.Command, args []string) error {
-	if len(args) > 0 {
-		if series == library {
-			return errors.New("configuration name given but no single configuration type set")
-		}
-	}
-
-	return nil
-}
-
-func RunList(cmd *cobra.Command, args []string) error {
+func runList(cmd *cobra.Command, args []string) error {
 	var settingsKey string
 	if len(args) > 0 {
 		settingsKey = args[0]
@@ -43,21 +32,12 @@ func RunList(cmd *cobra.Command, args []string) error {
 
 	switch {
 	case series:
-		err = printSeries(cmd, cfg, settingsKey)
+		return printSeries(cmd, cfg, settingsKey)
 	case library:
-		err = printLibrary(cmd, cfg, settingsKey)
+		return printLibrary(cmd, cfg, settingsKey)
 	default:
-		err = printSeriesBasic(cmd, cfg)
-		if err != nil {
-			return err
-		}
-		err = printLibraryBasic(cmd, cfg)
+		return errors.New("list: reached default branch, shouldn't have")
 	}
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func printSeries(cmd *cobra.Command, cfg types.Config, key string) error {

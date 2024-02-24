@@ -1,10 +1,16 @@
 package config
 
 import (
+	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/spf13/cobra"
 )
 
-var Cmd = &cobra.Command{
+const (
+	seriesFlag  = "series"
+	libraryFlag = "library"
+)
+
+var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Manage configurations",
 }
@@ -14,9 +20,17 @@ var (
 	library bool
 )
 
-func init() {
-	Cmd.PersistentFlags().BoolVarP(&series, "series", "s", false, "List one or all series configurations")
-	Cmd.PersistentFlags().BoolVarP(&library, "library", "l", false, "List one or all library configurations")
+func GetCmd() *cobra.Command {
+	return configCmd
+}
 
-	Cmd.AddCommand(listCmd, addCmd, removeCmd)
+func init() {
+	configCmd.PersistentFlags().BoolVarP(&series, seriesFlag, "s", false, "List one or all series configurations")
+	configCmd.PersistentFlags().BoolVarP(&library, libraryFlag, "l", false, "List one or all library configurations")
+	configCmd.MarkFlagsOneRequired(seriesFlag, libraryFlag)
+	configCmd.MarkFlagsMutuallyExclusive(seriesFlag, libraryFlag)
+
+	configCmd.AddCommand(addCmd, listCmd, removeCmd)
+
+	types.SeriesSetFlags(configCmd)
 }
