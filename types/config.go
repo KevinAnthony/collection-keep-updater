@@ -7,15 +7,15 @@ type Config struct {
 	Libraries []LibrarySettings `json:"libraries" mapstructure:"libraries"`
 }
 
-func getFlagOrNil[T any](cmd *cobra.Command, key string, value T) (out T) {
+func getFlagOrDefault[T any](cmd *cobra.Command, key string, flagValue, defaultValue T) T {
 	flag := cmd.Flag(key)
 	if flag == nil {
-		return out
+		return defaultValue
 	}
 
 	if flag.Changed {
-		return value
+		return flagValue
 	}
 
-	return out
+	return defaultValue
 }

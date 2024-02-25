@@ -2,6 +2,7 @@ package types
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 
 	"github.com/kevinanthony/collection-keep-updater/out"
@@ -13,11 +14,11 @@ import (
 )
 
 const (
-	seriesNameFlag      = "name"
-	seriesKeyFlag       = "key"
-	seriesURLFlag       = "url"
-	seriesSourceFlag    = "source"
-	seriesBlacklistFlag = "blacklist"
+	seriesNameF      = "name"
+	seriesKeyF       = "key"
+	seriesURLF       = "url"
+	seriesSourceF    = "source"
+	seriesBlacklistF = "blacklist"
 )
 
 type ISourceSettings interface {
@@ -69,22 +70,49 @@ func SeriesSetFlags(cmd *cobra.Command) {
 	wikipediaSetFlags(cmd)
 	vizSetFlags(cmd)
 
-	cmd.Flags().StringVar(&seriesNameV, seriesNameFlag, "", "name of the series.")
-	cmd.Flags().StringVar(&seriesKeyV, seriesKeyFlag, "", "unique key of the series.")
-	cmd.Flags().StringVar(&seriesURLV, seriesURLFlag, "", "url to be parsed for the series, extracting the ID.")
-	cmd.Flags().StringVar(&seriesSourceV, seriesSourceFlag, "", "type of source to be added. [viz, wikipieda]")
-	cmd.Flags().StringArrayVar(&seriesBlacklistV, seriesBlacklistFlag, []string{}, "list of ISBNs to be ignored.")
+	cmd.Flags().StringVar(&seriesNameV, seriesNameF, "", "name of the series.")
+	cmd.Flags().StringVar(&seriesKeyV, seriesKeyF, "", "unique key of the series.")
+	cmd.Flags().StringVar(&seriesURLV, seriesURLF, "", "url to be parsed for the series, extracting the ID.")
+	cmd.Flags().StringVar(&seriesSourceV, seriesSourceF, "", "type of source to be added. [viz, wikipieda]")
+	cmd.Flags().StringArrayVar(&seriesBlacklistV, seriesBlacklistF, []string{}, "list of ISBNs to be ignored.")
 }
 
 func NewSeriesConfig(cmd *cobra.Command) (Series, error) {
-	return SeriesConfigFromFlags(cmd, Series{})
+	return seriesConfigFromFlags(cmd, Series{})
 }
 
-func SeriesConfigFromFlags(cmd *cobra.Command, series Series) (Series, error) {
-	series.Name = getFlagOrNil[string](cmd, seriesNameFlag, seriesNameV)
-	series.Key = getFlagOrNil[string](cmd, seriesKeyFlag, seriesKeyV)
-	series.Source = SourceType(getFlagOrNil[string](cmd, seriesSourceFlag, seriesSourceV))
-	series.ISBNBlacklist = getFlagOrNil[[]string](cmd, seriesBlacklistFlag, seriesBlacklistV)
+func EditSeries(cmd *cobra.Command, cfg Config) (*Series, error) {
+	key := getFlagOrDefault[string](cmd, seriesKeyF, seriesKeyV, "")
+	if len(key) == 0 {
+		return nil, errors.New("key flag is required for edit")
+	}
+
+	var series *Series
+	for _, s := range cfg.Series {
+		if s.Key == key {
+			series = &s
+
+			break
+		}
+	}
+	//
+	if series == nil {
+		return nil, fmt.Errorf("edit: series key %s not found in config", key)
+	}
+
+	s, err := seriesConfigFromFlags(cmd, *series)
+	if err != nil {
+		return nil, err
+	}
+
+	return &s, nil
+}
+
+func seriesConfigFromFlags(cmd *cobra.Command, series Series) (Series, error) {
+	series.Name = getFlagOrDefault[string](cmd, seriesNameF, seriesNameV, series.Name)
+	series.Key = getFlagOrDefault[string](cmd, seriesKeyF, seriesKeyV, series.Key)
+	series.Source = SourceType(getFlagOrDefault[string](cmd, seriesSourceF, seriesSourceV, string(series.Source)))
+	series.ISBNBlacklist = getFlagOrDefault[[]string](cmd, seriesBlacklistF, seriesBlacklistV, series.ISBNBlacklist)
 
 	switch series.Source {
 	case WikipediaSource:

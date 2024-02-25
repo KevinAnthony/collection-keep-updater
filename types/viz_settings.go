@@ -47,25 +47,35 @@ func vizSetFlags(cmd *cobra.Command) {
 }
 
 func vizConfigFromFlags(cmd *cobra.Command, series Series) (Series, error) {
-	settings, ok := series.SourceSettings.(VizSettings)
+	settings, ok := series.SourceSettings.(*VizSettings)
 	if !ok {
-		settings = VizSettings{}
+		settings = &VizSettings{}
 	}
 
-	url := getFlagOrNil[string](cmd, seriesURLFlag, seriesURLV)
-	if len(url) == 0 {
-		return series, errors.New("unknown/unset url. url is required")
+	url := getFlagOrDefault[string](cmd, seriesURLF, seriesURLV, "")
+
+	// if url is empty and series ID is already set, do not try and reset it
+	if len(series.ID) == 0 || len(url) > 0 {
+		if len(url) == 0 {
+			return series, errors.New("unknown/unset url. url is required")
+		}
+
+		// regex maybe?
+		if !strings.HasPrefix(url, "https://www.viz.com/read/manga/") || !strings.HasSuffix(url, "/all") {
+			return series, errors.New("url is malformed")
+		}
+		url = strings.TrimPrefix(url, "https://www.viz.com/read/manga/")
+		series.ID = strings.TrimSuffix(url, "/all")
 	}
 
-	// regex maybe?
-	if !strings.HasPrefix(url, "https://www.viz.com/read/manga/") || !strings.HasSuffix(url, "/all") {
-		return series, errors.New("url is malformed")
-	}
-	url = strings.TrimPrefix(url, "https://www.viz.com/read/manga/")
-	series.ID = strings.TrimSuffix(url, "/all")
+	settings.MaximumBacklog = getFlagOrDefault[*int](cmd, vizMaxBacklogF, &vizMaxBacklogV, settings.MaximumBacklog)
 
-	settings.MaximumBacklog = getFlagOrNil[*int](cmd, vizMaxBacklogF, &vizMaxBacklogV)
-	delayStr := getFlagOrNil[*string](cmd, vizGetDelayF, &vizGetDelayV)
+	var str string
+	if settings.Delay != nil {
+		str = settings.Delay.String()
+	}
+
+	delayStr := getFlagOrDefault[*string](cmd, vizGetDelayF, &vizGetDelayV, &str)
 	if delayStr != nil {
 		delay, err := time.ParseDuration(*delayStr)
 		if err != nil {
@@ -73,7 +83,6 @@ func vizConfigFromFlags(cmd *cobra.Command, series Series) (Series, error) {
 		}
 		settings.Delay = &delay
 	}
-	series.SourceSettings = &settings
 
 	return series, nil
 }
