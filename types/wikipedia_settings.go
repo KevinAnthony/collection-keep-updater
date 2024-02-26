@@ -50,27 +50,27 @@ func (w WikipediaSettings) Print(cmd *cobra.Command) error {
 }
 
 func wikiConfigFromFlags(cmd *cobra.Command, series Series) (Series, error) {
-	settings, ok := series.SourceSettings.(WikipediaSettings)
+	settings, ok := series.SourceSettings.(*WikipediaSettings)
 	if !ok {
-		settings = WikipediaSettings{}
+		settings = &WikipediaSettings{}
 	}
 
-	url := getFlagOrNil[string](cmd, seriesURLFlag, seriesURLV)
-	if len(url) == 0 {
-		return series, errors.New("unknown/unset url.  url is required")
+	url := getFlagOrDefault[string](cmd, seriesURLF, seriesURLV, "")
+	// if url is empty and series ID is already set, do not try and reset it
+	if len(series.ID) == 0 || len(url) > 0 {
+		if len(url) == 0 {
+			return series, errors.New("unknown/unset url.  url is required")
+		}
+		if !strings.HasPrefix(url, "https://en.wikipedia.org/wiki/") {
+			return series, errors.New("url is malformed")
+		}
+
+		series.ID = strings.TrimPrefix(url, "https://en.wikipedia.org/wiki/")
 	}
-	if !strings.HasPrefix(url, "https://en.wikipedia.org/wiki/") {
-		return series, errors.New("url is malformed")
-	}
-
-	series.ID = strings.TrimPrefix(url, "https://en.wikipedia.org/wiki/")
-
-	settings.VolumeHeader = getFlagOrNil[*string](cmd, wikipediaVolumeFlag, &wikipediaVolumeV)
-	settings.TitleHeader = getFlagOrNil[*string](cmd, wikipediaTitleFlag, &wikipediaTitleV)
-	settings.ISBNHeader = getFlagOrNil[*string](cmd, wikipediaISBNFlag, &wikipediaISBNV)
-	settings.Table = getFlagOrNil[[]int](cmd, wikipediaTableFlag, wikipediaTableV)
-
-	series.SourceSettings = &settings
+	settings.VolumeHeader = getFlagOrDefault[*string](cmd, wikipediaVolumeFlag, &wikipediaVolumeV, settings.VolumeHeader)
+	settings.TitleHeader = getFlagOrDefault[*string](cmd, wikipediaTitleFlag, &wikipediaTitleV, settings.TitleHeader)
+	settings.ISBNHeader = getFlagOrDefault[*string](cmd, wikipediaISBNFlag, &wikipediaISBNV, settings.ISBNHeader)
+	settings.Table = getFlagOrDefault[[]int](cmd, wikipediaTableFlag, wikipediaTableV, settings.Table)
 
 	return series, nil
 }
