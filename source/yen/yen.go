@@ -6,7 +6,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/kevinanthony/collection-keep-updater/source"
+	"github.com/kevinanthony/collection-keep-updater/utils"
+
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
@@ -66,12 +67,12 @@ func (y yen) getBooksFromList(ctx context.Context, node *html.Node, id string) (
 	var books types.ISBNBooks
 
 	if node.Type == html.ElementNode && node.Data == "a" {
-		volumeURL, found := source.AttrContains(node.Attr, "href")
+		volumeURL, found := utils.AttrContains(node.Attr, "href")
 		if !found {
 			return nil, nil
 		}
 		if len(volumeURL) == 0 {
-			dataUrlStr, found := source.AttrContains(node.Attr, "data-url")
+			dataUrlStr, found := utils.AttrContains(node.Attr, "data-url")
 			if !found {
 				return nil, nil
 			}
