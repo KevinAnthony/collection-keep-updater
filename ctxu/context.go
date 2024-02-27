@@ -3,6 +3,8 @@ package ctxu
 import (
 	"context"
 
+	"github.com/kevinanthony/collection-keep-updater/source/yen"
+
 	"github.com/kevinanthony/collection-keep-updater/library/libib"
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
@@ -54,6 +56,7 @@ func SetDI(cmd *cobra.Command, cfg types.Config) {
 	sources := map[types.SourceType]types.ISource{
 		types.WikipediaSource: wikipedia.New(httpClient),
 		types.VizSource:       viz.New(httpClient),
+		types.YenSource:       yen.New(httpClient),
 	}
 
 	ctx = context.WithValue(ctx, librariesKey, libraries)

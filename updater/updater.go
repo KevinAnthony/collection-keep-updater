@@ -51,6 +51,10 @@ func (u updater) GetAllAvailableBooks(ctx context.Context, series []types.Series
 			continue
 		}
 
+		if s.Source != types.YenSource {
+			continue
+		}
+
 		source, found := u.source[s.Source]
 		if !found {
 			return nil, fmt.Errorf("source: %s is unknown", s.Source)
