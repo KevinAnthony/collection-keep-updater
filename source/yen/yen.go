@@ -3,13 +3,13 @@ package yen
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"net/url"
 	"strings"
 
 	"github.com/kevinanthony/collection-keep-updater/source"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
+
 	"golang.org/x/net/html"
 )
 
@@ -104,8 +104,6 @@ func (y yen) getBooksFromList(ctx context.Context, node *html.Node, id string) (
 }
 
 func (y yen) parseURL(url string) types.ISBNBook {
-
-	fmt.Println(url)
 	slugs := strings.Split(url, "/")
 	slugSplit := strings.Split(slugs[len(slugs)-1], "-")
 	isbn13 := slugSplit[0]
