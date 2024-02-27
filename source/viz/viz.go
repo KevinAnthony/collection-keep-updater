@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kevinanthony/collection-keep-updater/source"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 	"github.com/kevinanthony/gorps/v2/http"
@@ -85,8 +86,8 @@ func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks
 func (v viz) walkSeriesPage(node *html.Node) []string {
 	var seriesPages []string
 
-	if node.Type == html.ElementNode && node.Data == "a" && attrEquals(node.Attr, "role", "presentation") {
-		url, found := attrContains(node.Attr, "href")
+	if node.Type == html.ElementNode && node.Data == "a" && source.AttrEquals(node.Attr, "role", "presentation") {
+		url, found := source.AttrContains(node.Attr, "href")
 		if found {
 			seriesPages = append(seriesPages, url)
 		}
@@ -174,23 +175,4 @@ func getISBNFromStrong(node *html.Node) string {
 	}
 
 	return node.NextSibling.Data
-}
-
-func attrEquals(attr []html.Attribute, key string, value string) bool {
-	val, found := attrContains(attr, key)
-	if !found {
-		return false
-	}
-
-	return strings.EqualFold(val, value)
-}
-
-func attrContains(attr []html.Attribute, key string) (string, bool) {
-	for _, attrKey := range attr {
-		if attrKey.Key == key {
-			return attrKey.Val, true
-		}
-	}
-
-	return "", false
 }
