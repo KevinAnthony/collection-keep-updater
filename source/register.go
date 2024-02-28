@@ -1,7 +1,6 @@
 package source
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
@@ -28,7 +27,7 @@ func RegisterConfigCallbacks(key types.SourceType, callback *ConfigCallback) {
 	if _callbacks == nil {
 		_callbacks = map[types.SourceType]*ConfigCallback{}
 	}
-	fmt.Println(callback)
+
 	_callbacks[key] = callback
 }
 
@@ -47,8 +46,7 @@ func GetCallback(key types.SourceType) *ConfigCallback {
 func SetSourceFlags(cmd *cobra.Command) {
 	_callbackMutex.RLock()
 	defer _callbackMutex.RUnlock()
-	c := _callbacks
-	fmt.Println(c)
+
 	for _, cb := range _callbacks {
 		cb.SetFlagsFunc(cmd)
 	}

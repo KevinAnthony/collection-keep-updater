@@ -30,7 +30,6 @@ const (
 )
 
 func seriesSetFlags(cmd *cobra.Command) {
-
 	cmd.Flags().StringVar(&seriesNameV, seriesNameF, "", "name of the series.")
 	cmd.Flags().StringVar(&seriesKeyV, seriesKeyF, "", "unique key of the series.")
 	cmd.Flags().StringVar(&seriesURLV, seriesURLF, "", "url to be parsed for the series, extracting the ID.")
