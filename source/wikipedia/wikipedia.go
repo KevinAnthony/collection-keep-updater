@@ -30,7 +30,7 @@ func New(client http.Client) types.ISource {
 
 func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
 	tg := client.NewTableGetter("keep-updater")
-	settings, ok := series.SourceSettings.(*types.WikipediaSettings)
+	settings, ok := series.SourceSettings.(*wikiSettings)
 	if !ok {
 		return nil, fmt.Errorf("setting type not correct")
 	}
@@ -52,7 +52,7 @@ func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.IS
 	return books, nil
 }
 
-func (l wikiSource) processRow(series types.Series, settings types.WikipediaSettings, row map[string]string) *types.ISBNBook {
+func (l wikiSource) processRow(series types.Series, settings wikiSettings, row map[string]string) *types.ISBNBook {
 	book := types.ISBNBook{
 		Volume: l.getVolume(row, settings),
 		Title:  l.getTitle(row, settings),
@@ -71,7 +71,7 @@ func (l wikiSource) processRow(series types.Series, settings types.WikipediaSett
 	return nil
 }
 
-func (l wikiSource) getVolume(row map[string]string, tableSetting types.WikipediaSettings) string {
+func (l wikiSource) getVolume(row map[string]string, tableSetting wikiSettings) string {
 	if tableSetting.VolumeHeader == nil {
 		return ""
 	}
@@ -88,7 +88,7 @@ func (l wikiSource) getVolume(row map[string]string, tableSetting types.Wikipedi
 	return fmt.Sprintf("%03d", v)
 }
 
-func (l wikiSource) getTitle(row map[string]string, tableSetting types.WikipediaSettings) string {
+func (l wikiSource) getTitle(row map[string]string, tableSetting wikiSettings) string {
 	if tableSetting.TitleHeader == nil {
 		return ""
 	}
@@ -100,7 +100,7 @@ func (l wikiSource) getTitle(row map[string]string, tableSetting types.Wikipedia
 	return title
 }
 
-func (l wikiSource) getISBN10(row map[string]string, tableSetting types.WikipediaSettings) string {
+func (l wikiSource) getISBN10(row map[string]string, tableSetting wikiSettings) string {
 	if tableSetting.ISBNHeader == nil {
 		return ""
 	}
@@ -113,7 +113,7 @@ func (l wikiSource) getISBN10(row map[string]string, tableSetting types.Wikipedi
 	return l.regexISBN(isbnStr, types.ISBN10regex, 10)
 }
 
-func (l wikiSource) getISBN13(row map[string]string, tableSetting types.WikipediaSettings) string {
+func (l wikiSource) getISBN13(row map[string]string, tableSetting wikiSettings) string {
 	if tableSetting.ISBNHeader == nil {
 		return ""
 	}

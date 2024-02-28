@@ -3,11 +3,9 @@ package config
 import (
 	"fmt"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/out"
-	"github.com/kevinanthony/collection-keep-updater/types"
-
-	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -24,7 +22,7 @@ var addCmd = &cobra.Command{
 }
 
 func init() {
-	types.SeriesSetFlags(addCmd)
+	SeriesSetFlags(addCmd)
 	addCmd.PersistentFlags().BoolVarP(&try, "test-config", "t", false, "test the configuration by calling source and outputting result.")
 	addCmd.PersistentFlags().BoolVarP(&write, "write-config", "w", false, "save the configuration.")
 
@@ -35,7 +33,7 @@ func init() {
 func runAdd(cmd *cobra.Command, args []string) error {
 	switch {
 	case isSeries:
-		s, err := types.NewSeriesConfig(cmd)
+		s, err := NewSeriesConfig(cmd)
 		if err != nil {
 			return err
 		}

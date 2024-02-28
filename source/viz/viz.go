@@ -33,7 +33,7 @@ func New(client http.Client) types.ISource {
 }
 
 func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
-	settings, ok := series.SourceSettings.(*types.VizSettings)
+	settings, ok := series.SourceSettings.(*vizSettings)
 	if !ok {
 		return nil, fmt.Errorf("setting type not correct")
 	}
