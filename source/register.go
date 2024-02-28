@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
+
 	"github.com/spf13/cobra"
 )
 

@@ -6,6 +6,7 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/source"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
