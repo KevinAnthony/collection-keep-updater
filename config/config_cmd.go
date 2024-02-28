@@ -30,6 +30,4 @@ func init() {
 	configCmd.MarkFlagsMutuallyExclusive(seriesFlag, libraryFlag)
 
 	configCmd.AddCommand(addCmd, listCmd, editCmd, removeCmd)
-
-	SeriesSetFlags(configCmd)
 }

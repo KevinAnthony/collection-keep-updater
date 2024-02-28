@@ -9,16 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	maxBacklogF = "max-backlog"
-	getDelayF   = "get-delay"
-)
-
-var (
-	maxBacklogV int
-	getDelayV   string
-)
-
 type vizSettings struct {
 	MaximumBacklog *int           `json:"maximum_backlog" yaml:"maximum_backlog"`
 	Delay          *time.Duration `json:"delay_between"   yaml:"delay_between"`

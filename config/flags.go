@@ -29,21 +29,22 @@ const (
 	seriesBlacklistF = "blacklist"
 )
 
-func SeriesSetFlags(cmd *cobra.Command) {
-	source.SetSourceFlags(cmd)
+func seriesSetFlags(cmd *cobra.Command) {
 
 	cmd.Flags().StringVar(&seriesNameV, seriesNameF, "", "name of the series.")
 	cmd.Flags().StringVar(&seriesKeyV, seriesKeyF, "", "unique key of the series.")
 	cmd.Flags().StringVar(&seriesURLV, seriesURLF, "", "url to be parsed for the series, extracting the ID.")
 	cmd.Flags().StringVar(&seriesSourceV, seriesSourceF, "", "type of source to be added. [viz, wikipieda]")
 	cmd.Flags().StringArrayVar(&seriesBlacklistV, seriesBlacklistF, []string{}, "list of ISBNs to be ignored.")
+
+	source.SetSourceFlags(cmd)
 }
 
-func NewSeriesConfig(cmd *cobra.Command) (types.Series, error) {
+func newSeriesConfig(cmd *cobra.Command) (types.Series, error) {
 	return seriesConfigFromFlags(cmd, types.Series{})
 }
 
-func EditSeries(cmd *cobra.Command, cfg types.Config) (*types.Series, error) {
+func editSeries(cmd *cobra.Command, cfg types.Config) (*types.Series, error) {
 	key := utils.GetFlagOrDefault[string](cmd, seriesKeyF, seriesKeyV, "")
 	if len(key) == 0 {
 		return nil, errors.New("key flag is required for edit")

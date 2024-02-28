@@ -23,18 +23,19 @@ var addCmd = &cobra.Command{
 }
 
 func init() {
-	SeriesSetFlags(addCmd)
 	addCmd.PersistentFlags().BoolVarP(&try, "test-config", "t", false, "test the configuration by calling source and outputting result.")
 	addCmd.PersistentFlags().BoolVarP(&write, "write-config", "w", false, "save the configuration.")
 
 	addCmd.MarkFlagsOneRequired("test-config", "write-config")
 	addCmd.MarkFlagsMutuallyExclusive("test-config", "write-config")
+
+	seriesSetFlags(addCmd)
 }
 
 func runAdd(cmd *cobra.Command, args []string) error {
 	switch {
 	case isSeries:
-		s, err := NewSeriesConfig(cmd)
+		s, err := newSeriesConfig(cmd)
 		if err != nil {
 			return err
 		}

@@ -7,20 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	volumeF = "volume-header"
-	titleF  = "title-header"
-	isbnF   = "isbn-header"
-	tableF  = "table-numbers"
-)
-
-var (
-	volumeV string
-	titleV  string
-	isbnV   string
-	tableV  []int
-)
-
 type wikiSettings struct {
 	VolumeHeader *string `json:"volume_header" yaml:"volume_header"`
 	TitleHeader  *string `json:"title_header"  yaml:"title_header"`
