@@ -57,7 +57,7 @@ func editSeries(cmd *cobra.Command, cfg types.Config) (*types.Series, error) {
 			break
 		}
 	}
-	//
+
 	if series == nil {
 		return nil, fmt.Errorf("edit: series key %s not found in config", key)
 	}
