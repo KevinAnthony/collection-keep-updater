@@ -3,7 +3,10 @@ package yen
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"net/url"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
@@ -34,14 +37,33 @@ func New(client http.Client) types.ISource {
 }
 
 func (y yen) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
-	return y.callGetMore(ctx, series.ID, startPosition)
+	books, err := y.callGetMore(ctx, series, startPosition)
+	if err != nil {
+		return nil, err
+	}
+
+	sort.Slice(books, func(i, j int) bool {
+		iInt, err := strconv.Atoi(books[i].Volume)
+		if err != nil {
+			return false
+		}
+
+		jInt, err := strconv.Atoi(books[j].Volume)
+		if err != nil {
+			return false
+		}
+
+		return iInt < jInt
+	})
+
+	return books, nil
 }
 
-func (y yen) callGetMore(ctx context.Context, id, next string) (types.ISBNBooks, error) {
+func (y yen) callGetMore(ctx context.Context, series types.Series, next string) (types.ISBNBooks, error) {
 	req, err := http.
 		NewRequest(y.client).
 		Get().
-		URL("%s/series/get_more/%s", baseURL, id).
+		URL("%s/series/get_more/%s", baseURL, series.ID).
 		Header("x-requested-with", "XMLHttpRequest").
 		Query(nextQuery, next).
 		CreateRequest(ctx)
@@ -59,10 +81,10 @@ func (y yen) callGetMore(ctx context.Context, id, next string) (types.ISBNBooks,
 		return nil, err
 	}
 
-	return y.getBooksFromList(ctx, node, id)
+	return y.getBooksFromList(ctx, node, series)
 }
 
-func (y yen) getBooksFromList(ctx context.Context, node *html.Node, id string) (types.ISBNBooks, error) {
+func (y yen) getBooksFromList(ctx context.Context, node *html.Node, series types.Series) (types.ISBNBooks, error) {
 	var books types.ISBNBooks
 
 	if node.Type == html.ElementNode && node.Data == "a" {
@@ -82,15 +104,17 @@ func (y yen) getBooksFromList(ctx context.Context, node *html.Node, id string) (
 			}
 
 			if next := dataUrl.Query().Get(nextQuery); len(next) > 0 {
-				return y.callGetMore(ctx, id, next)
+				return y.callGetMore(ctx, series, next)
 			}
 		} else {
-			books = append(books, y.parseURL(volumeURL))
+			book := y.parseURL(volumeURL)
+			book.Title = fmt.Sprintf("%s Vol. %s", series.Name, book.Volume)
+			books = append(books, book)
 		}
 	}
 
 	for child := node.FirstChild; child != nil; child = child.NextSibling {
-		pages, err := y.getBooksFromList(ctx, child, id)
+		pages, err := y.getBooksFromList(ctx, child, series)
 		if err != nil {
 			return nil, err
 		}
