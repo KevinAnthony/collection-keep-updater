@@ -11,7 +11,6 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
 	golang.org/x/net v0.20.0
-	moul.io/http2curl v1.0.0
 )
 
 require (

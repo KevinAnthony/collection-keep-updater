@@ -4,7 +4,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kevinanthony/collection-keep-updater/source"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 
@@ -17,39 +16,30 @@ const (
 	getDelayF   = "viz-get-delay"
 )
 
-var (
+type vizFlags struct {
 	maxBacklogV int
 	getDelayV   string
-)
-
-func init() {
-	source.RegisterConfigCallbacks(types.VizSource, &source.ConfigCallback{
-		SetFlagsFunc:                setFlags,
-		SourceSettingFromConfigFunc: newVizSettings,
-		SourceSettingFromFlagsFunc:  configFromFlags,
-		GetIDFromURL:                parseURLToID,
-	})
 }
 
-func setFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().IntVar(&maxBacklogV, maxBacklogF, 0, "how many volumes from the end to check.")
-	cmd.PersistentFlags().StringVar(&getDelayV, getDelayF, "", "how long a delay to wait between each request, in go time.Duration format.")
+func (v vizFlags) SetFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().IntVar(&v.maxBacklogV, maxBacklogF, 0, "how many volumes from the end to check.")
+	cmd.PersistentFlags().StringVar(&v.getDelayV, getDelayF, "", "how long a delay to wait between each request, in go time.Duration format.")
 }
 
-func configFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
+func (v vizFlags) SourceSettingFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
 	settings, ok := sourceSetting.(*vizSettings)
 	if !ok {
 		settings = &vizSettings{}
 	}
 
-	settings.MaximumBacklog = utils.GetFlagOrDefault[*int](cmd, maxBacklogF, &maxBacklogV, settings.MaximumBacklog)
+	settings.MaximumBacklog = utils.GetFlagOrDefault[*int](cmd, maxBacklogF, &v.maxBacklogV, settings.MaximumBacklog)
 
 	var str string
 	if settings.Delay != nil {
 		str = settings.Delay.String()
 	}
 
-	delayStr := utils.GetFlagOrDefault[*string](cmd, getDelayF, &getDelayV, &str)
+	delayStr := utils.GetFlagOrDefault[*string](cmd, getDelayF, &v.getDelayV, &str)
 	if delayStr != nil {
 		delay, err := time.ParseDuration(*delayStr)
 		if err != nil {
@@ -61,7 +51,7 @@ func configFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (t
 	return settings, nil
 }
 
-func parseURLToID(url string) (string, error) {
+func (v vizFlags) GetIDFromURL(url string) (string, error) {
 	if len(url) == 0 {
 		return "", errors.New("unknown/unset url. url is required")
 	}
@@ -75,7 +65,7 @@ func parseURLToID(url string) (string, error) {
 	return strings.TrimSuffix(url, "/all"), nil
 }
 
-func newVizSettings(data map[string]interface{}) types.ISourceSettings {
+func (v vizFlags) SourceSettingFromConfig(data map[string]interface{}) types.ISourceSettings {
 	if len(data) == 0 {
 		return nil
 	}

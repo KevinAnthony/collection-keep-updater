@@ -2,6 +2,8 @@ package types
 
 import (
 	"context"
+
+	"github.com/spf13/cobra"
 )
 
 type (
@@ -16,4 +18,12 @@ type ILibrary interface {
 
 type ISource interface {
 	GetISBNs(ctx context.Context, series Series) (ISBNBooks, error)
+	ISourceSetting
+}
+
+type ISourceSetting interface {
+	SetFlags(cmd *cobra.Command)
+	SourceSettingFromConfig(data map[string]interface{}) ISourceSettings
+	SourceSettingFromFlags(cmd *cobra.Command, original ISourceSettings) (ISourceSettings, error)
+	GetIDFromURL(url string) (string, error)
 }
