@@ -7,8 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type yenSettings struct {
-}
+type yenSettings struct{}
 
 func (w yenSettings) Print(cmd *cobra.Command) error {
 	t := out.NewTable(cmd)

@@ -33,7 +33,6 @@ func configFromFlags(_ *cobra.Command, sourceSetting types.ISourceSettings) (typ
 }
 
 func setFlags(_ *cobra.Command) {
-
 }
 
 func parseURLToID(url string) (string, error) {
