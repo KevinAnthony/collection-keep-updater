@@ -9,8 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type settingsHelper struct {
-}
+type settingsHelper struct{}
 
 func (s settingsHelper) SourceSettingFromConfig(_ map[string]interface{}) types.ISourceSettings {
 	return &yenSettings{}
