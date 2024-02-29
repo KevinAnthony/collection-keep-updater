@@ -1,8 +1,6 @@
 package config
 
 import (
-	"github.com/kevinanthony/collection-keep-updater/types"
-
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +30,4 @@ func init() {
 	configCmd.MarkFlagsMutuallyExclusive(seriesFlag, libraryFlag)
 
 	configCmd.AddCommand(addCmd, listCmd, editCmd, removeCmd)
-
-	types.SeriesSetFlags(configCmd)
 }

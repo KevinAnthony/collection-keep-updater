@@ -26,7 +26,7 @@ Configure it with different sources and it will compare what you already have li
 
 func LoadConfig(cmd *cobra.Command, args []string) error {
 	var cfg types.Config
-	if err := viper.Unmarshal(&cfg, types.SeriesConfigHookFunc()); err != nil {
+	if err := viper.Unmarshal(&cfg, config.SeriesConfigHookFunc()); err != nil {
 		return err
 	}
 

@@ -5,7 +5,6 @@ import (
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/out"
-	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
@@ -19,12 +18,13 @@ var editCmd = &cobra.Command{
 }
 
 func init() {
-	types.SeriesSetFlags(editCmd)
 	editCmd.PersistentFlags().BoolVarP(&try, "test-config", "t", false, "test the configuration by calling source and outputting result.")
 	editCmd.PersistentFlags().BoolVarP(&write, "write-config", "w", false, "save the configuration.")
 
 	editCmd.MarkFlagsOneRequired("test-config", "write-config")
 	editCmd.MarkFlagsMutuallyExclusive("test-config", "write-config")
+
+	seriesSetFlags(editCmd)
 }
 
 func runEdit(cmd *cobra.Command, args []string) error {
@@ -35,7 +35,7 @@ func runEdit(cmd *cobra.Command, args []string) error {
 
 	switch {
 	case isSeries:
-		s, err := types.EditSeries(cmd, cfg)
+		s, err := editSeries(cmd, cfg)
 		if err != nil {
 			return err
 		}
