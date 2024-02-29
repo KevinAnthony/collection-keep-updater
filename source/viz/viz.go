@@ -19,7 +19,7 @@ import (
 const baseURL = "https://www.viz.com"
 
 type viz struct {
-	vizFlags
+	settingsHelper
 	client http.Client
 }
 
@@ -29,8 +29,8 @@ func New(client http.Client) types.ISource {
 	}
 
 	return viz{
-		vizFlags: vizFlags{},
-		client:   client,
+		settingsHelper: settingsHelper{},
+		client:         client,
 	}
 }
 

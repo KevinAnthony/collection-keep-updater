@@ -15,6 +15,7 @@ import (
 )
 
 type wikiSource struct {
+	settingsHelper
 	client http.Client
 }
 
@@ -24,7 +25,8 @@ func New(client http.Client) types.ISource {
 	}
 
 	return wikiSource{
-		client: client,
+		settingsHelper: settingsHelper{},
+		client:         client,
 	}
 }
 

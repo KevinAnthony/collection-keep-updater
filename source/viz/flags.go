@@ -16,17 +16,17 @@ const (
 	getDelayF   = "viz-get-delay"
 )
 
-type vizFlags struct {
+type settingsHelper struct {
 	maxBacklogV int
 	getDelayV   string
 }
 
-func (v vizFlags) SetFlags(cmd *cobra.Command) {
+func (v settingsHelper) SetFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().IntVar(&v.maxBacklogV, maxBacklogF, 0, "how many volumes from the end to check.")
 	cmd.PersistentFlags().StringVar(&v.getDelayV, getDelayF, "", "how long a delay to wait between each request, in go time.Duration format.")
 }
 
-func (v vizFlags) SourceSettingFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
+func (v settingsHelper) SourceSettingFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
 	settings, ok := sourceSetting.(*vizSettings)
 	if !ok {
 		settings = &vizSettings{}
@@ -51,7 +51,7 @@ func (v vizFlags) SourceSettingFromFlags(cmd *cobra.Command, sourceSetting types
 	return settings, nil
 }
 
-func (v vizFlags) GetIDFromURL(url string) (string, error) {
+func (v settingsHelper) GetIDFromURL(url string) (string, error) {
 	if len(url) == 0 {
 		return "", errors.New("unknown/unset url. url is required")
 	}
@@ -65,7 +65,7 @@ func (v vizFlags) GetIDFromURL(url string) (string, error) {
 	return strings.TrimSuffix(url, "/all"), nil
 }
 
-func (v vizFlags) SourceSettingFromConfig(data map[string]interface{}) types.ISourceSettings {
+func (v settingsHelper) SourceSettingFromConfig(data map[string]interface{}) types.ISourceSettings {
 	if len(data) == 0 {
 		return nil
 	}
