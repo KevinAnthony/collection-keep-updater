@@ -4,7 +4,12 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/kevinanthony/collection-keep-updater/source"
+	"github.com/kevinanthony/collection-keep-updater/source/viz"
+	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
+	"github.com/kevinanthony/collection-keep-updater/source/yen"
+
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
+
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 
@@ -36,7 +41,9 @@ func seriesSetFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&seriesSourceV, seriesSourceF, "", "type of source to be added. [viz, wikipieda]")
 	cmd.Flags().StringArrayVar(&seriesBlacklistV, seriesBlacklistF, []string{}, "list of ISBNs to be ignored.")
 
-	source.SetSourceFlags(cmd)
+	viz.SetFlags(cmd)
+	wikipedia.SetFlags(cmd)
+	yen.SetFlags(cmd)
 }
 
 func newSeriesConfig(cmd *cobra.Command) (types.Series, error) {
@@ -78,8 +85,8 @@ func seriesConfigFromFlags(cmd *cobra.Command, series types.Series) (types.Serie
 
 	url := utils.GetFlagOrDefault[string](cmd, seriesURLF, seriesURLV, "")
 
-	cb := source.GetCallback(series.Source)
-	if cb == nil {
+	sourceSetting, err := ctxu.GetSourceSetting(cmd, series.Source)
+	if err != nil {
 		return series, errors.New("unknown/unset source.  source is required")
 	}
 
@@ -89,7 +96,7 @@ func seriesConfigFromFlags(cmd *cobra.Command, series types.Series) (types.Serie
 			return series, errors.New("unknown/unset url. url is required")
 		}
 
-		id, err := cb.GetIDFromURL(url)
+		id, err := sourceSetting.GetIDFromURL(url)
 		if err != nil {
 			return series, err
 		}
@@ -97,7 +104,7 @@ func seriesConfigFromFlags(cmd *cobra.Command, series types.Series) (types.Serie
 		series.ID = id
 	}
 
-	settings, err := cb.SourceSettingFromFlagsFunc(cmd, series.SourceSettings)
+	settings, err := sourceSetting.SourceSettingFromFlags(cmd, series.SourceSettings)
 	if err != nil {
 		return series, err
 	}
@@ -107,7 +114,7 @@ func seriesConfigFromFlags(cmd *cobra.Command, series types.Series) (types.Serie
 	return series, nil
 }
 
-func SeriesConfigHookFunc() viper.DecoderConfigOption {
+func SeriesConfigHookFunc(cmd *cobra.Command) viper.DecoderConfigOption {
 	return viper.DecodeHook(func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
 		if f.Kind() != reflect.Map {
 			return data, nil
@@ -131,22 +138,22 @@ func SeriesConfigHookFunc() viper.DecoderConfigOption {
 			ISBNBlacklist: utils.GetArray[string](values, "isbn_blacklist"),
 		}
 
-		series.SourceSettings = getSetting(series.Source, sourceValue)
+		series.SourceSettings = getSetting(cmd, series.Source, sourceValue)
 
 		return series, nil
 	},
 	)
 }
 
-func getSetting(key types.SourceType, data map[string]interface{}) types.ISourceSettings {
+func getSetting(cmd *cobra.Command, key types.SourceType, data map[string]interface{}) types.ISourceSettings {
 	if len(data) == 0 {
 		return nil
 	}
 
-	cb := source.GetCallback(key)
-	if cb == nil {
+	sourceSetting, err := ctxu.GetSourceSetting(cmd, key)
+	if err != nil {
 		return nil
 	}
 
-	return cb.SourceSettingFromConfigFunc(data)
+	return sourceSetting.SourceSettingFromConfig(data)
 }

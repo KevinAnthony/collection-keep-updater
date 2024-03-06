@@ -17,12 +17,14 @@ const (
 	tableF  = "wiki-table-numbers"
 )
 
-type settingsHelper struct {
+var (
 	volumeV string
 	titleV  string
 	isbnV   string
 	tableV  []int
-}
+)
+
+type settingsHelper struct{}
 
 func (s settingsHelper) GetIDFromURL(url string) (string, error) {
 	if len(url) == 0 {
@@ -41,19 +43,12 @@ func (s settingsHelper) SourceSettingFromFlags(cmd *cobra.Command, sourceSetting
 		settings = &wikiSettings{}
 	}
 
-	settings.VolumeHeader = utils.GetFlagOrDefault[*string](cmd, volumeF, &s.volumeV, settings.VolumeHeader)
-	settings.TitleHeader = utils.GetFlagOrDefault[*string](cmd, titleF, &s.titleV, settings.TitleHeader)
-	settings.ISBNHeader = utils.GetFlagOrDefault[*string](cmd, isbnF, &s.isbnV, settings.ISBNHeader)
-	settings.Table = utils.GetFlagOrDefault[[]int](cmd, tableF, s.tableV, settings.Table)
+	settings.VolumeHeader = utils.GetFlagOrDefault[*string](cmd, volumeF, &volumeV, settings.VolumeHeader)
+	settings.TitleHeader = utils.GetFlagOrDefault[*string](cmd, titleF, &titleV, settings.TitleHeader)
+	settings.ISBNHeader = utils.GetFlagOrDefault[*string](cmd, isbnF, &isbnV, settings.ISBNHeader)
+	settings.Table = utils.GetFlagOrDefault[[]int](cmd, tableF, tableV, settings.Table)
 
 	return settings, nil
-}
-
-func (s settingsHelper) SetFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVar(&s.volumeV, volumeF, "", "header of the column that has the volume number.")
-	cmd.PersistentFlags().StringVar(&s.titleV, titleF, "", "header of the column that has the title.")
-	cmd.PersistentFlags().StringVar(&s.isbnV, isbnF, "", "header of the column that has the ISBN number(required).")
-	cmd.PersistentFlags().IntSliceVar(&s.tableV, tableF, []int{}, "tables to include, zero indexed. skip for all tables.")
 }
 
 func (s settingsHelper) SourceSettingFromConfig(data map[string]interface{}) types.ISourceSettings {
@@ -73,4 +68,11 @@ func (s settingsHelper) SourceSettingFromConfig(data map[string]interface{}) typ
 	}
 
 	return &settings
+}
+
+func SetFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().StringVar(&volumeV, volumeF, "", "header of the column that has the volume number.")
+	cmd.PersistentFlags().StringVar(&titleV, titleF, "", "header of the column that has the title.")
+	cmd.PersistentFlags().StringVar(&isbnV, isbnF, "", "header of the column that has the ISBN number(required).")
+	cmd.PersistentFlags().IntSliceVar(&tableV, tableF, []int{}, "tables to include, zero indexed. skip for all tables.")
 }

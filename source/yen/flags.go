@@ -24,9 +24,6 @@ func (s settingsHelper) SourceSettingFromFlags(_ *cobra.Command, sourceSetting t
 	return settings, nil
 }
 
-func (s settingsHelper) SetFlags(_ *cobra.Command) {
-}
-
 func (s settingsHelper) GetIDFromURL(url string) (string, error) {
 	if len(url) == 0 {
 		return "", errors.New("unknown/unset url.  url is required")
@@ -36,4 +33,7 @@ func (s settingsHelper) GetIDFromURL(url string) (string, error) {
 	}
 
 	return strings.TrimPrefix(url, "https://yenpress.com/series/"), nil
+}
+
+func SetFlags(_ *cobra.Command) {
 }
