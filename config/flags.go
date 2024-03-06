@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
-
-	"github.com/kevinanthony/collection-keep-updater/ctxu"
-
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 
