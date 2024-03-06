@@ -4,7 +4,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kevinanthony/collection-keep-updater/source"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 
@@ -22,21 +21,14 @@ var (
 	getDelayV   string
 )
 
-func init() {
-	source.RegisterConfigCallbacks(types.VizSource, &source.ConfigCallback{
-		SetFlagsFunc:                setFlags,
-		SourceSettingFromConfigFunc: newVizSettings,
-		SourceSettingFromFlagsFunc:  configFromFlags,
-		GetIDFromURL:                parseURLToID,
-	})
-}
+type settingsHelper struct{}
 
-func setFlags(cmd *cobra.Command) {
+func SetFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().IntVar(&maxBacklogV, maxBacklogF, 0, "how many volumes from the end to check.")
 	cmd.PersistentFlags().StringVar(&getDelayV, getDelayF, "", "how long a delay to wait between each request, in go time.Duration format.")
 }
 
-func configFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
+func (v settingsHelper) SourceSettingFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
 	settings, ok := sourceSetting.(*vizSettings)
 	if !ok {
 		settings = &vizSettings{}
@@ -61,7 +53,7 @@ func configFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (t
 	return settings, nil
 }
 
-func parseURLToID(url string) (string, error) {
+func (v settingsHelper) GetIDFromURL(url string) (string, error) {
 	if len(url) == 0 {
 		return "", errors.New("unknown/unset url. url is required")
 	}
@@ -75,7 +67,7 @@ func parseURLToID(url string) (string, error) {
 	return strings.TrimSuffix(url, "/all"), nil
 }
 
-func newVizSettings(data map[string]interface{}) types.ISourceSettings {
+func (v settingsHelper) SourceSettingFromConfig(data map[string]interface{}) types.ISourceSettings {
 	if len(data) == 0 {
 		return nil
 	}

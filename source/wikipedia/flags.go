@@ -3,7 +3,6 @@ package wikipedia
 import (
 	"strings"
 
-	"github.com/kevinanthony/collection-keep-updater/source"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 
@@ -25,16 +24,9 @@ var (
 	tableV  []int
 )
 
-func init() {
-	source.RegisterConfigCallbacks(types.WikipediaSource, &source.ConfigCallback{
-		SetFlagsFunc:                setFlags,
-		SourceSettingFromConfigFunc: newWikipediaSettings,
-		SourceSettingFromFlagsFunc:  configFromFlags,
-		GetIDFromURL:                parseURLToID,
-	})
-}
+type settingsHelper struct{}
 
-func parseURLToID(url string) (string, error) {
+func (s settingsHelper) GetIDFromURL(url string) (string, error) {
 	if len(url) == 0 {
 		return "", errors.New("unknown/unset url.  url is required")
 	}
@@ -45,7 +37,7 @@ func parseURLToID(url string) (string, error) {
 	return strings.TrimPrefix(url, "https://en.wikipedia.org/wiki/"), nil
 }
 
-func configFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
+func (s settingsHelper) SourceSettingFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
 	settings, ok := sourceSetting.(*wikiSettings)
 	if !ok {
 		settings = &wikiSettings{}
@@ -59,14 +51,7 @@ func configFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (t
 	return settings, nil
 }
 
-func setFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVar(&volumeV, volumeF, "", "header of the column that has the volume number.")
-	cmd.PersistentFlags().StringVar(&titleV, titleF, "", "header of the column that has the title.")
-	cmd.PersistentFlags().StringVar(&isbnV, isbnF, "", "header of the column that has the ISBN number(required).")
-	cmd.PersistentFlags().IntSliceVar(&tableV, tableF, []int{}, "tables to include, zero indexed. skip for all tables.")
-}
-
-func newWikipediaSettings(data map[string]interface{}) types.ISourceSettings {
+func (s settingsHelper) SourceSettingFromConfig(data map[string]interface{}) types.ISourceSettings {
 	if len(data) == 0 {
 		return nil
 	}
@@ -83,4 +68,11 @@ func newWikipediaSettings(data map[string]interface{}) types.ISourceSettings {
 	}
 
 	return &settings
+}
+
+func SetFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().StringVar(&volumeV, volumeF, "", "header of the column that has the volume number.")
+	cmd.PersistentFlags().StringVar(&titleV, titleF, "", "header of the column that has the title.")
+	cmd.PersistentFlags().StringVar(&isbnV, isbnF, "", "header of the column that has the ISBN number(required).")
+	cmd.PersistentFlags().IntSliceVar(&tableV, tableF, []int{}, "tables to include, zero indexed. skip for all tables.")
 }

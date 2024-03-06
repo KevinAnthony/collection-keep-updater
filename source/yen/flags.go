@@ -4,26 +4,18 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/kevinanthony/collection-keep-updater/source"
 	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	source.RegisterConfigCallbacks(types.YenSource, &source.ConfigCallback{
-		SetFlagsFunc:                setFlags,
-		SourceSettingFromConfigFunc: newYenSettings,
-		SourceSettingFromFlagsFunc:  configFromFlags,
-		GetIDFromURL:                parseURLToID,
-	})
-}
+type settingsHelper struct{}
 
-func newYenSettings(_ map[string]interface{}) types.ISourceSettings {
+func (s settingsHelper) SourceSettingFromConfig(_ map[string]interface{}) types.ISourceSettings {
 	return &yenSettings{}
 }
 
-func configFromFlags(_ *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
+func (s settingsHelper) SourceSettingFromFlags(_ *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
 	settings, ok := sourceSetting.(*yenSettings)
 	if !ok {
 		settings = &yenSettings{}
@@ -32,10 +24,7 @@ func configFromFlags(_ *cobra.Command, sourceSetting types.ISourceSettings) (typ
 	return settings, nil
 }
 
-func setFlags(_ *cobra.Command) {
-}
-
-func parseURLToID(url string) (string, error) {
+func (s settingsHelper) GetIDFromURL(url string) (string, error) {
 	if len(url) == 0 {
 		return "", errors.New("unknown/unset url.  url is required")
 	}
@@ -44,4 +33,7 @@ func parseURLToID(url string) (string, error) {
 	}
 
 	return strings.TrimPrefix(url, "https://yenpress.com/series/"), nil
+}
+
+func SetFlags(_ *cobra.Command) {
 }

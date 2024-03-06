@@ -2,6 +2,7 @@ package ctxu
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kevinanthony/collection-keep-updater/library/libib"
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
@@ -80,4 +81,20 @@ func GetSources(cmd *cobra.Command) (map[types.SourceType]types.ISource, error) 
 	}
 
 	return nil, errors.New("sources not found in context")
+}
+
+func GetSourceSetting(cmd *cobra.Command, sourceType types.SourceType) (types.ISourceHelpers, error) {
+	value := cmd.Context().Value(sorucesKey)
+
+	sourceMap, ok := value.(map[types.SourceType]types.ISource)
+	if !ok {
+		return nil, errors.New("sources not found in context")
+	}
+
+	source, ok := sourceMap[sourceType]
+	if !ok {
+		return nil, fmt.Errorf("source type %s not found in sources map", sourceType)
+	}
+
+	return source, nil
 }

@@ -23,6 +23,7 @@ const (
 )
 
 type yen struct {
+	settingsHelper
 	client http.Client
 }
 
@@ -32,7 +33,8 @@ func New(client http.Client) types.ISource {
 	}
 
 	return yen{
-		client: client,
+		settingsHelper: settingsHelper{},
+		client:         client,
 	}
 }
 
