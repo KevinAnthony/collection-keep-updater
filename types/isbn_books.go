@@ -29,3 +29,26 @@ func (b ISBNBooks) Contains(book ISBNBook) bool {
 
 	return false
 }
+
+func (b ISBNBooks) FindByISBN(isbn string) int {
+	var book ISBNBook
+	if len(isbn) == 10 {
+		book.ISBN10 = isbn
+	} else if len(isbn) == 13 {
+		book.ISBN13 = isbn
+	} else {
+		return -1
+	}
+
+	for i, l := range b {
+		if l.Equals(book) {
+			return i
+		}
+	}
+
+	return -1
+}
+
+func (b ISBNBooks) RemoveAt(i int) ISBNBooks {
+	return append(b[:i], b[i+1:]...)
+}

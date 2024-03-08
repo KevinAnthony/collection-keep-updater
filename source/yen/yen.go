@@ -58,6 +58,13 @@ func (y yen) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks
 		return iInt < jInt
 	})
 
+	for _, blackISBN := range series.ISBNBlacklist {
+		index := books.FindByISBN(blackISBN)
+		if index >= 0 {
+			books = books.RemoveAt(index)
+		}
+	}
+
 	return books, nil
 }
 

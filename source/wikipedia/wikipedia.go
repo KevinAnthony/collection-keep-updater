@@ -51,6 +51,14 @@ func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.IS
 			}
 		}
 	}
+
+	for _, blackISBN := range series.ISBNBlacklist {
+		index := books.FindByISBN(blackISBN)
+		if index >= 0 {
+			books = books.RemoveAt(index)
+		}
+	}
+
 	return books, nil
 }
 
