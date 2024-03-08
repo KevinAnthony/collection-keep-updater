@@ -1,5 +1,11 @@
 package types
 
+import (
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/kevinanthony/collection-keep-updater/out"
+	"github.com/spf13/cobra"
+)
+
 type ISBNBooks []ISBNBook
 
 func NewISBNBooks(length int) ISBNBooks {
@@ -51,4 +57,16 @@ func (b ISBNBooks) FindByISBN(isbn string) int {
 
 func (b ISBNBooks) RemoveAt(i int) ISBNBooks {
 	return append(b[:i], b[i+1:]...)
+}
+
+func (b ISBNBooks) Print(cmd *cobra.Command) error {
+	t := out.NewTable(cmd)
+	t.AppendHeader(table.Row{"Title", "Volume", "ISBN 10", "ISBN 13", "Source"})
+	for _, book := range b {
+		t.AppendRow(table.Row{book.Title, book.Volume, book.ISBN10, book.ISBN13, book.Source})
+	}
+
+	t.Render()
+
+	return nil
 }

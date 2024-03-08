@@ -66,7 +66,7 @@ func run(cmd *cobra.Command, _ []string) error {
 
 			continue
 		case try:
-			if err := library.OutputWanted(cmd, wanted); err != nil {
+			if err := wanted.Print(cmd); err != nil {
 				return err
 			}
 		case write:

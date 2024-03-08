@@ -16,7 +16,10 @@ import (
 	"golang.org/x/net/html"
 )
 
-const baseURL = "https://www.viz.com"
+const (
+	baseURL    = "https://www.viz.com"
+	sourceName = "Viz"
+)
 
 type viz struct {
 	settingsHelper
@@ -134,10 +137,10 @@ func (v viz) getBookFromSeriesPage(ctx context.Context, series types.Series, pat
 	volume := getVolumeFromPath(path)
 
 	return &types.ISBNBook{
-		ISBN13:  getISBNFromBody(node),
-		Title:   fmt.Sprintf("%s: #%s", series.Name, volume),
-		Binding: "",
-		Volume:  volume,
+		ISBN13: getISBNFromBody(node),
+		Title:  fmt.Sprintf("%s: #%s", series.Name, volume),
+		Volume: volume,
+		Source: sourceName,
 	}, nil
 }
 

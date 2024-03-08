@@ -14,6 +14,10 @@ import (
 	"github.com/atye/wikitable2json/pkg/client"
 )
 
+const (
+	sourceName = "Wikipedia"
+)
+
 type wikiSource struct {
 	settingsHelper
 	client http.Client
@@ -68,6 +72,7 @@ func (l wikiSource) processRow(series types.Series, settings wikiSettings, row m
 		Title:  l.getTitle(row, settings),
 		ISBN10: l.getISBN10(row, settings),
 		ISBN13: l.getISBN13(row, settings),
+		Source: sourceName,
 	}
 
 	if len(book.Title) == 0 {

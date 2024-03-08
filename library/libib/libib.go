@@ -5,13 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kevinanthony/collection-keep-updater/out"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/gocarina/gocsv"
-	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/spf13/cobra"
 )
 
 const (
@@ -57,18 +54,6 @@ func (l libIB) SaveWanted(wanted types.ISBNBooks) error {
 	}
 
 	return gocsv.MarshalFile(l.createCSVEntries(wanted), outFile)
-}
-
-func (l libIB) OutputWanted(cmd *cobra.Command, wanted types.ISBNBooks) error {
-	t := out.NewTable(cmd)
-	t.AppendHeader(table.Row{"Title", "Volume", "ISBN 10", "ISBN 13"})
-	for _, book := range wanted {
-		t.AppendRow(table.Row{book.Title, book.Volume, book.ISBN10, book.ISBN13})
-	}
-
-	t.Render()
-
-	return nil
 }
 
 func (l libIB) createISBNBook(entries []libibCSVEntries) types.ISBNBooks {

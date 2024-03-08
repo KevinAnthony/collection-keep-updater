@@ -20,6 +20,7 @@ const (
 	baseURL       = "https://yenpress.com"
 	nextQuery     = "next_ord"
 	startPosition = "999" // TODO make configurable
+	sourceName    = "Yen Press"
 )
 
 type yen struct {
@@ -159,5 +160,6 @@ func (y yen) parseURL(url string) types.ISBNBook {
 	return types.ISBNBook{
 		ISBN13: isbn13,
 		Volume: vol,
+		Source: sourceName,
 	}
 }
