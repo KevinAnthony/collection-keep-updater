@@ -11,7 +11,7 @@ import (
 
 type Updater interface {
 	GetAllAvailableBooks(ctx context.Context, series []types.Series) (types.ISBNBooks, error)
-	UpdateLibrary(ctx context.Context, library types.ILibrary, availableBooks types.ISBNBooks) error
+	UpdateLibrary(ctx context.Context, library types.ILibrary, availableBooks types.ISBNBooks) (types.ISBNBooks, error)
 }
 
 type updater struct {
@@ -24,23 +24,18 @@ func New(source map[types.SourceType]types.ISource) Updater {
 	}
 }
 
-func (u updater) UpdateLibrary(_ context.Context, library types.ILibrary, availableBooks types.ISBNBooks) error {
+func (u updater) UpdateLibrary(_ context.Context, library types.ILibrary, availableBooks types.ISBNBooks) (types.ISBNBooks, error) {
 	booksInLibrary, err := library.GetBooksInCollection()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	wanted, err := booksInLibrary.Diff(availableBooks)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = u.SaveWanted(library, wanted)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return wanted, nil
 }
 
 func (u updater) GetAllAvailableBooks(ctx context.Context, series []types.Series) (types.ISBNBooks, error) {
@@ -68,14 +63,4 @@ func (u updater) GetAllAvailableBooks(ctx context.Context, series []types.Series
 	}
 
 	return allBooks, nil
-}
-
-func (u updater) SaveWanted(library types.ILibrary, wanted types.ISBNBooks) error {
-	if len(wanted) == 0 {
-		fmt.Println("No New Wanted books")
-
-		return nil
-	}
-
-	return library.SaveWanted(wanted, false)
 }

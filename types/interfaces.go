@@ -13,7 +13,8 @@ type (
 
 type ILibrary interface {
 	GetBooksInCollection() (ISBNBooks, error)
-	SaveWanted(wanted ISBNBooks, withTitle bool) error
+	SaveWanted(wanted ISBNBooks) error
+	OutputWanted(cmd *cobra.Command, wanted ISBNBooks) error
 }
 
 type ISource interface {
