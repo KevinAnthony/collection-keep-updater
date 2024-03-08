@@ -18,10 +18,10 @@ type ILibrary interface {
 
 type ISource interface {
 	GetISBNs(ctx context.Context, series Series) (ISBNBooks, error)
-	ISourceHelpers
+	ISourceConfig
 }
 
-type ISourceHelpers interface {
+type ISourceConfig interface {
 	SourceSettingFromConfig(data map[string]interface{}) ISourceSettings
 	SourceSettingFromFlags(cmd *cobra.Command, original ISourceSettings) (ISourceSettings, error)
 	GetIDFromURL(url string) (string, error)
