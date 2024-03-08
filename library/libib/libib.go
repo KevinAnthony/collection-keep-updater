@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/kevinanthony/collection-keep-updater/out"
-	"github.com/spf13/cobra"
-
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/gocarina/gocsv"
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/spf13/cobra"
 )
 
 const (
