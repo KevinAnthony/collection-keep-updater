@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kevinanthony/collection-keep-updater/source/kodansha"
+
 	"github.com/kevinanthony/collection-keep-updater/library/libib"
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
@@ -57,6 +59,7 @@ func SetDI(cmd *cobra.Command, cfg types.Config) {
 		types.WikipediaSource: wikipedia.New(httpClient),
 		types.VizSource:       viz.New(httpClient),
 		types.YenSource:       yen.New(httpClient),
+		types.Kodansha:        kodansha.New(httpClient),
 	}
 
 	ctx = context.WithValue(ctx, librariesKey, libraries)
