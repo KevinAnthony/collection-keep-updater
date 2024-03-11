@@ -26,6 +26,8 @@ func init() {
 
 	addCmd.MarkFlagsOneRequired("test-config", "write-config")
 	addCmd.MarkFlagsMutuallyExclusive("test-config", "write-config")
+
+	seriesSetFlags(addCmd)
 }
 
 func runAdd(cmd *cobra.Command, args []string) error {
