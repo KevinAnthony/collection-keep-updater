@@ -6,12 +6,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
+	"github.com/kevinanthony/gorps/v2/http"
+
 	"github.com/pkg/errors"
 	"golang.org/x/net/html"
-
-	"github.com/kevinanthony/collection-keep-updater/types"
-	"github.com/kevinanthony/gorps/v2/http"
 )
 
 const (

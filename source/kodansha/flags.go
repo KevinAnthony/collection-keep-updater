@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
