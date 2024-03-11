@@ -14,6 +14,10 @@ import (
 	"github.com/atye/wikitable2json/pkg/client"
 )
 
+const (
+	sourceName = "Wikipedia"
+)
+
 type wikiSource struct {
 	settingsHelper
 	client http.Client
@@ -51,6 +55,14 @@ func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.IS
 			}
 		}
 	}
+
+	for _, blackISBN := range series.ISBNBlacklist {
+		index := books.FindByISBN(blackISBN)
+		if index >= 0 {
+			books = books.RemoveAt(index)
+		}
+	}
+
 	return books, nil
 }
 
@@ -60,6 +72,7 @@ func (l wikiSource) processRow(series types.Series, settings wikiSettings, row m
 		Title:  l.getTitle(row, settings),
 		ISBN10: l.getISBN10(row, settings),
 		ISBN13: l.getISBN13(row, settings),
+		Source: sourceName,
 	}
 
 	if len(book.Title) == 0 {

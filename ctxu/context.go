@@ -83,7 +83,7 @@ func GetSources(cmd *cobra.Command) (map[types.SourceType]types.ISource, error) 
 	return nil, errors.New("sources not found in context")
 }
 
-func GetSourceSetting(cmd *cobra.Command, sourceType types.SourceType) (types.ISourceHelpers, error) {
+func GetSourceSetting(cmd *cobra.Command, sourceType types.SourceType) (types.ISourceConfig, error) {
 	value := cmd.Context().Value(sorucesKey)
 
 	sourceMap, ok := value.(map[types.SourceType]types.ISource)

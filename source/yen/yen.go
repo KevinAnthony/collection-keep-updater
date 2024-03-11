@@ -20,6 +20,7 @@ const (
 	baseURL       = "https://yenpress.com"
 	nextQuery     = "next_ord"
 	startPosition = "999" // TODO make configurable
+	sourceName    = "Yen Press"
 )
 
 type yen struct {
@@ -57,6 +58,13 @@ func (y yen) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks
 
 		return iInt < jInt
 	})
+
+	for _, blackISBN := range series.ISBNBlacklist {
+		index := books.FindByISBN(blackISBN)
+		if index >= 0 {
+			books = books.RemoveAt(index)
+		}
+	}
 
 	return books, nil
 }
@@ -152,5 +160,6 @@ func (y yen) parseURL(url string) types.ISBNBook {
 	return types.ISBNBook{
 		ISBN13: isbn13,
 		Volume: vol,
+		Source: sourceName,
 	}
 }

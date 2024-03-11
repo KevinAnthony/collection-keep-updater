@@ -5,11 +5,11 @@ import (
 )
 
 type ISBNBook struct {
-	ISBN10  string
-	ISBN13  string
-	Title   string
-	Binding string
-	Volume  string
+	ISBN10 string
+	ISBN13 string
+	Title  string
+	Volume string
+	Source string
 }
 
 func (A ISBNBook) Equals(B ISBNBook) bool {

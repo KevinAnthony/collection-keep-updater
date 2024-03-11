@@ -14,15 +14,14 @@ type (
 type ILibrary interface {
 	GetBooksInCollection() (ISBNBooks, error)
 	SaveWanted(wanted ISBNBooks) error
-	OutputWanted(cmd *cobra.Command, wanted ISBNBooks) error
 }
 
 type ISource interface {
 	GetISBNs(ctx context.Context, series Series) (ISBNBooks, error)
-	ISourceHelpers
+	ISourceConfig
 }
 
-type ISourceHelpers interface {
+type ISourceConfig interface {
 	SourceSettingFromConfig(data map[string]interface{}) ISourceSettings
 	SourceSettingFromFlags(cmd *cobra.Command, original ISourceSettings) (ISourceSettings, error)
 	GetIDFromURL(url string) (string, error)

@@ -4,9 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
-	"github.com/kevinanthony/collection-keep-updater/out"
 
-	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -28,6 +26,8 @@ func init() {
 
 	addCmd.MarkFlagsOneRequired("test-config", "write-config")
 	addCmd.MarkFlagsMutuallyExclusive("test-config", "write-config")
+
+	seriesSetFlags(addCmd)
 }
 
 func runAdd(cmd *cobra.Command, args []string) error {
@@ -54,13 +54,7 @@ func runAdd(cmd *cobra.Command, args []string) error {
 				return err
 			}
 
-			t := out.NewTable(cmd)
-			t.AppendHeader(table.Row{"Title", "Volume", "ISBN 10", "ISBN 13"})
-			for _, book := range books {
-				t.AppendRow(table.Row{book.Title, book.Volume, book.ISBN10, book.ISBN13})
-			}
-
-			t.Render()
+			books.Print(cmd)
 		}
 
 		if write {
