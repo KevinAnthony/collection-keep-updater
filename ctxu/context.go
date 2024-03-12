@@ -86,7 +86,6 @@ func GetSource(cmd types.ICommand, sourceType types.SourceType) (types.ISource, 
 
 	source, found := sources[sourceType]
 	if !found {
-
 		return nil, fmt.Errorf("source type %s not found in source map", sourceType)
 	}
 

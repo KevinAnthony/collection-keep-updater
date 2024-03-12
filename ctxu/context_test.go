@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
-
 	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/smartystreets/goconvey/convey"

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
-
 	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/pkg/errors"
@@ -16,8 +15,7 @@ type IUpdater interface {
 	UpdateLibrary(ctx context.Context, library types.ILibrary, availableBooks types.ISBNBooks) (types.ISBNBooks, error)
 }
 
-type updater struct {
-}
+type updater struct{}
 
 func NewUpdater() IUpdater {
 	return updater{}
