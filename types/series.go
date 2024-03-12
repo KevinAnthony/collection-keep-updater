@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	"github.com/kevinanthony/collection-keep-updater/out"
 
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -42,4 +44,17 @@ func (s Series) Print(cmd *cobra.Command) error {
 	}
 
 	return nil
+}
+
+func GetSetting[t ISourceSettings](s Series) (empty t, err error) {
+	if s.SourceSettings == nil {
+		return empty, err
+	}
+
+	settings, ok := s.SourceSettings.(t)
+	if ok {
+		return settings, nil
+	}
+
+	return empty, fmt.Errorf("setting type not correct")
 }

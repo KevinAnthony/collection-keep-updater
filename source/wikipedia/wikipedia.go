@@ -36,9 +36,9 @@ func New(client http.Client) types.ISource {
 
 func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
 	tg := client.NewTableGetter("keep-updater")
-	settings, ok := series.SourceSettings.(*wikiSettings)
-	if !ok {
-		return nil, fmt.Errorf("setting type not correct")
+	settings, err := types.GetSetting[wikiSettings](series)
+	if err != nil {
+		return nil, err
 	}
 
 	tables, err := tg.GetTablesKeyValue(ctx, series.ID, "en", false, 1, settings.Table...)
@@ -49,7 +49,7 @@ func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.IS
 	books := types.NewISBNBooks(len(tables))
 	for _, table := range tables {
 		for _, row := range table {
-			book := l.processRow(series, *settings, row)
+			book := l.processRow(series, settings, row)
 			if book != nil {
 				books = append(books, *book)
 			}

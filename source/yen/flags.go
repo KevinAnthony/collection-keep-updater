@@ -12,7 +12,7 @@ import (
 type settingsHelper struct{}
 
 func (s settingsHelper) SourceSettingFromConfig(_ map[string]interface{}) types.ISourceSettings {
-	return &yenSettings{}
+	return yenSettings{}
 }
 
 func (s settingsHelper) SourceSettingFromFlags(_ *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {

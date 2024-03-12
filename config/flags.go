@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
+	"github.com/kevinanthony/collection-keep-updater/source/kodansha"
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
@@ -42,6 +43,7 @@ func seriesSetFlags(cmd *cobra.Command) {
 	viz.SetFlags(cmd)
 	wikipedia.SetFlags(cmd)
 	yen.SetFlags(cmd)
+	kodansha.SetFlags(cmd)
 }
 
 func newSeriesConfig(cmd *cobra.Command) (types.Series, error) {

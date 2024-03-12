@@ -46,14 +46,16 @@ func initConfig() {
 	_ = viper.ReadInConfig()
 }
 
-func LoadConfig(cmd *cobra.Command, args []string) error {
+func LoadConfig(cmd *cobra.Command, _ []string) error {
+	ctxu.SetDI(cmd)
 	var cfg types.Config
+
 	if err := viper.Unmarshal(&cfg, config.SeriesConfigHookFunc(cmd)); err != nil {
 		return err
 	}
 
 	ctxu.SetConfig(cmd, cfg)
-	ctxu.SetDI(cmd, cfg)
+	ctxu.SetLibSettings(cmd, cfg)
 
 	return nil
 }

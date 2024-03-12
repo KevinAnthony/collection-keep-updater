@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kevinanthony/collection-keep-updater/library/libib"
+	"github.com/kevinanthony/collection-keep-updater/source/kodansha"
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
@@ -21,7 +22,8 @@ type ctxKey string
 const (
 	configKey    ctxKey = "config_ctx_key"
 	librariesKey ctxKey = "libraries_ctx_key"
-	sorucesKey   ctxKey = "sources_ctx_key"
+	sourcesKey   ctxKey = "sources_ctx_key"
+	httpKey      ctxKey = "http_ctx_key"
 )
 
 func SetConfig(cmd *cobra.Command, cfg types.Config) {
@@ -41,10 +43,31 @@ func GetConfig(cmd *cobra.Command) (types.Config, error) {
 	return types.Config{}, errors.New("configuration not found in context")
 }
 
-func SetDI(cmd *cobra.Command, cfg types.Config) {
+func SetDI(cmd *cobra.Command) {
 	ctx := cmd.Context()
 
 	httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
+
+	sources := map[types.SourceType]types.ISource{
+		types.WikipediaSource: wikipedia.New(httpClient),
+		types.VizSource:       viz.New(httpClient),
+		types.YenSource:       yen.New(httpClient),
+		types.Kodansha:        kodansha.New(httpClient),
+	}
+
+	ctx = context.WithValue(ctx, sourcesKey, sources)
+	ctx = context.WithValue(ctx, httpKey, httpClient)
+
+	cmd.SetContext(ctx)
+}
+
+func SetLibSettings(cmd *cobra.Command, cfg types.Config) {
+	ctx := cmd.Context()
+
+	httpClient, ok := ctx.Value(httpKey).(http.Client)
+	if !ok {
+		panic("library not set in context")
+	}
 
 	libraries := map[types.LibraryType]types.ILibrary{}
 	for _, setting := range cfg.Libraries {
@@ -53,14 +76,8 @@ func SetDI(cmd *cobra.Command, cfg types.Config) {
 			libraries[types.LibIBLibrary] = libib.New(setting, httpClient)
 		}
 	}
-	sources := map[types.SourceType]types.ISource{
-		types.WikipediaSource: wikipedia.New(httpClient),
-		types.VizSource:       viz.New(httpClient),
-		types.YenSource:       yen.New(httpClient),
-	}
 
 	ctx = context.WithValue(ctx, librariesKey, libraries)
-	ctx = context.WithValue(ctx, sorucesKey, sources)
 
 	cmd.SetContext(ctx)
 }
@@ -75,7 +92,7 @@ func GetLibraries(cmd *cobra.Command) (map[types.LibraryType]types.ILibrary, err
 }
 
 func GetSources(cmd *cobra.Command) (map[types.SourceType]types.ISource, error) {
-	value := cmd.Context().Value(sorucesKey)
+	value := cmd.Context().Value(sourcesKey)
 	if source, ok := value.(map[types.SourceType]types.ISource); ok {
 		return source, nil
 	}
@@ -84,7 +101,7 @@ func GetSources(cmd *cobra.Command) (map[types.SourceType]types.ISource, error) 
 }
 
 func GetSourceSetting(cmd *cobra.Command, sourceType types.SourceType) (types.ISourceConfig, error) {
-	value := cmd.Context().Value(sorucesKey)
+	value := cmd.Context().Value(sourcesKey)
 
 	sourceMap, ok := value.(map[types.SourceType]types.ISource)
 	if !ok {

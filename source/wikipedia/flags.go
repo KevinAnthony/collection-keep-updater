@@ -53,7 +53,7 @@ func (s settingsHelper) SourceSettingFromFlags(cmd *cobra.Command, sourceSetting
 
 func (s settingsHelper) SourceSettingFromConfig(data map[string]interface{}) types.ISourceSettings {
 	if len(data) == 0 {
-		return nil
+		return wikiSettings{}
 	}
 
 	settings := wikiSettings{
@@ -64,10 +64,10 @@ func (s settingsHelper) SourceSettingFromConfig(data map[string]interface{}) typ
 	}
 
 	if settings.ISBNHeader == nil || len(*settings.ISBNHeader) == 0 {
-		return nil
+		return wikiSettings{}
 	}
 
-	return &settings
+	return settings
 }
 
 func SetFlags(cmd *cobra.Command) {

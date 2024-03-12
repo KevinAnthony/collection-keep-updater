@@ -9,7 +9,7 @@ import (
 
 type yenSettings struct{}
 
-func (w yenSettings) Print(cmd *cobra.Command) error {
+func (y yenSettings) Print(cmd *cobra.Command) error {
 	t := out.NewTable(cmd)
 	t.AppendHeader(table.Row{"No Yen Settings"})
 

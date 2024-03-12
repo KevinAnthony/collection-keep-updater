@@ -69,7 +69,7 @@ func (v settingsHelper) GetIDFromURL(url string) (string, error) {
 
 func (v settingsHelper) SourceSettingFromConfig(data map[string]interface{}) types.ISourceSettings {
 	if len(data) == 0 {
-		return nil
+		return vizSettings{}
 	}
 
 	settings := vizSettings{
@@ -86,5 +86,5 @@ func (v settingsHelper) SourceSettingFromConfig(data map[string]interface{}) typ
 		}
 	}
 
-	return &settings
+	return settings
 }
