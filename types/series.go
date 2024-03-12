@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+//go:generate mockery --name=ISourceSettings --structname=ISourceSettingsMock --filename=series_mock.go --inpackage
 type ISourceSettings interface {
 	Print(cmd *cobra.Command) error
 }

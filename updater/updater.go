@@ -9,7 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Updater interface {
+//go:generate mockery --name=IUpdater --structname=IUpdaterMock --filename=updater_mock.go --inpackage
+type IUpdater interface {
 	GetAllAvailableBooks(ctx context.Context, series []types.Series) (types.ISBNBooks, error)
 	UpdateLibrary(ctx context.Context, library types.ILibrary, availableBooks types.ISBNBooks) (types.ISBNBooks, error)
 }
@@ -18,7 +19,7 @@ type updater struct {
 	source map[types.SourceType]types.ISource
 }
 
-func New(source map[types.SourceType]types.ISource) Updater {
+func New(source map[types.SourceType]types.ISource) IUpdater {
 	return updater{
 		source: source,
 	}
