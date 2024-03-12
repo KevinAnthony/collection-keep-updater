@@ -43,14 +43,9 @@ func run(cmd types.ICommand, _ []string) error {
 		return err
 	}
 
-	sources, err := ctxu.GetSources(cmd)
-	if err != nil {
-		return err
-	}
+	updateSvc := NewUpdater()
 
-	updateSvc := New(sources)
-
-	availableBooks, err := updateSvc.GetAllAvailableBooks(cmd.Context(), cfg.Series)
+	availableBooks, err := updateSvc.GetAllAvailableBooks(cmd, cfg.Series)
 	if err != nil {
 		return err
 	}

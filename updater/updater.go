@@ -2,7 +2,8 @@ package updater
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
 
@@ -11,18 +12,15 @@ import (
 
 //go:generate mockery --name=IUpdater --structname=IUpdaterMock --filename=updater_mock.go --inpackage
 type IUpdater interface {
-	GetAllAvailableBooks(ctx context.Context, series []types.Series) (types.ISBNBooks, error)
+	GetAllAvailableBooks(ctx types.ICommand, series []types.Series) (types.ISBNBooks, error)
 	UpdateLibrary(ctx context.Context, library types.ILibrary, availableBooks types.ISBNBooks) (types.ISBNBooks, error)
 }
 
 type updater struct {
-	source map[types.SourceType]types.ISource
 }
 
-func New(source map[types.SourceType]types.ISource) IUpdater {
-	return updater{
-		source: source,
-	}
+func NewUpdater() IUpdater {
+	return updater{}
 }
 
 func (u updater) UpdateLibrary(_ context.Context, library types.ILibrary, availableBooks types.ISBNBooks) (types.ISBNBooks, error) {
@@ -39,7 +37,7 @@ func (u updater) UpdateLibrary(_ context.Context, library types.ILibrary, availa
 	return wanted, nil
 }
 
-func (u updater) GetAllAvailableBooks(ctx context.Context, series []types.Series) (types.ISBNBooks, error) {
+func (u updater) GetAllAvailableBooks(cmd types.ICommand, series []types.Series) (types.ISBNBooks, error) {
 	allBooks := types.NewISBNBooks(0)
 
 	for _, s := range series {
@@ -47,11 +45,12 @@ func (u updater) GetAllAvailableBooks(ctx context.Context, series []types.Series
 			continue
 		}
 
-		source, found := u.source[s.Source]
-		if !found {
-			return nil, fmt.Errorf("source: %s is unknown", s.Source)
+		source, err := ctxu.GetSource(cmd, s.Source)
+		if err != nil {
+			return nil, errors.Wrapf(err, "%s is unknown", s.Source)
 		}
-		books, err := source.GetISBNs(ctx, s)
+
+		books, err := source.GetISBNs(cmd.Context(), s)
 		if err != nil {
 			return nil, errors.Wrapf(err, s.Name)
 		}

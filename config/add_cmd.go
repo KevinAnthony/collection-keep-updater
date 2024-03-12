@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
 
@@ -40,14 +38,9 @@ func runAdd(cmd types.ICommand, args []string) error {
 		}
 
 		if try {
-			sources, err := ctxu.GetSources(cmd)
+			source, err := ctxu.GetSource(cmd, s.Source)
 			if err != nil {
 				return err
-			}
-
-			source, found := sources[s.Source]
-			if !found {
-				return fmt.Errorf("source type %s not found in source map", s.Source)
 			}
 
 			books, err := source.GetISBNs(cmd.Context(), s)

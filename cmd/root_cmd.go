@@ -3,8 +3,14 @@ package cmd
 import (
 	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
+	"github.com/kevinanthony/collection-keep-updater/source/kodansha"
+	"github.com/kevinanthony/collection-keep-updater/source/viz"
+	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
+	"github.com/kevinanthony/collection-keep-updater/source/yen"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/updater"
+	"github.com/kevinanthony/gorps/v2/encoder"
+	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -47,7 +53,16 @@ func initConfig() {
 }
 
 func LoadConfig(cmd types.ICommand, _ []string) error {
-	ctxu.SetDI(cmd)
+	httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
+
+	sources := map[types.SourceType]types.ISource{
+		types.WikipediaSource: wikipedia.New(httpClient),
+		types.VizSource:       viz.New(httpClient),
+		types.YenSource:       yen.New(httpClient),
+		types.Kodansha:        kodansha.New(httpClient),
+	}
+
+	ctxu.SetDI(cmd, httpClient, sources)
 	var cfg types.Config
 
 	if err := viper.Unmarshal(&cfg, config.SeriesConfigHookFunc(cmd)); err != nil {
