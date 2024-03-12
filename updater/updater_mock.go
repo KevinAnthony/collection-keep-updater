@@ -15,15 +15,15 @@ type IUpdaterMock struct {
 }
 
 // GetAllAvailableBooks provides a mock function with given fields: ctx, series
-func (_m *IUpdaterMock) GetAllAvailableBooks(ctx context.Context, series []types.Series) (types.ISBNBooks, error) {
+func (_m *IUpdaterMock) GetAllAvailableBooks(ctx types.ICommand, series []types.Series) (types.ISBNBooks, error) {
 	ret := _m.Called(ctx, series)
 
 	var r0 types.ISBNBooks
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, []types.Series) (types.ISBNBooks, error)); ok {
+	if rf, ok := ret.Get(0).(func(types.ICommand, []types.Series) (types.ISBNBooks, error)); ok {
 		return rf(ctx, series)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, []types.Series) types.ISBNBooks); ok {
+	if rf, ok := ret.Get(0).(func(types.ICommand, []types.Series) types.ISBNBooks); ok {
 		r0 = rf(ctx, series)
 	} else {
 		if ret.Get(0) != nil {
@@ -31,7 +31,7 @@ func (_m *IUpdaterMock) GetAllAvailableBooks(ctx context.Context, series []types
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, []types.Series) error); ok {
+	if rf, ok := ret.Get(1).(func(types.ICommand, []types.Series) error); ok {
 		r1 = rf(ctx, series)
 	} else {
 		r1 = ret.Error(1)
