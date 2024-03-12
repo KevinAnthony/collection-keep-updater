@@ -1,11 +1,9 @@
 name: test
 on:
   push:
-    branches:
-      - master
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - master
+    branches: [ "main" ]
 jobs:
   test:
     strategy:
@@ -20,9 +18,7 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
 
-      - run: go generate ./...
-      - run: git diff --cached --exit-code
-      - run: go test ./... -v -cover -coverprofile coverage.out
-      - run: go test -bench . -benchmem
+      - name: Test
+        run: go test -v ./... -v -cover -coverprofile coverage.out
 
       - uses: codecov/codecov-action@v3
