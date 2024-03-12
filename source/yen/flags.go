@@ -1,8 +1,9 @@
 package yen
 
 import (
-	"errors"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
 
