@@ -5,13 +5,10 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
-
 	"github.com/spf13/pflag"
 )
 
-var (
-	_ ICommand = (*cobra.Command)(nil)
-)
+var _ ICommand = (*cobra.Command)(nil)
 
 //go:generate mockery --name=ICommand --structname=ICommandMock --filename=cmd_mock.go --inpackage
 type ICommand interface {
