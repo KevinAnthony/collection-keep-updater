@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/out"
 	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
