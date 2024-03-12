@@ -19,7 +19,7 @@ var (
 		Short: "Keep your book wanted library up to date",
 		Long: `Keep your book collection wanted section up to date.  
 Configure it with different sources and it will compare what you already have listed with what is available and generate a wanted list.`,
-		PersistentPreRunE: LoadConfig,
+		PersistentPreRunE: types.CmdPersistentPreRunE(LoadConfig),
 	}
 )
 
@@ -35,7 +35,7 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		viper.AddConfigPath("$HOME/.keepu")
+		viper.AddConfigPath("$HOME/.config/noside/")
 		viper.AddConfigPath(".")
 		viper.SetConfigType("yaml")
 		viper.SetConfigName("config")
@@ -46,7 +46,7 @@ func initConfig() {
 	_ = viper.ReadInConfig()
 }
 
-func LoadConfig(cmd *cobra.Command, _ []string) error {
+func LoadConfig(cmd types.ICommand, _ []string) error {
 	ctxu.SetDI(cmd)
 	var cfg types.Config
 

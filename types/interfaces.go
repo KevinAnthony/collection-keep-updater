@@ -2,8 +2,6 @@ package types
 
 import (
 	"context"
-
-	"github.com/spf13/cobra"
 )
 
 type (
@@ -26,6 +24,6 @@ type ISource interface {
 //go:generate mockery --name=ISourceConfig --structname=ISourceConfigMock --filename=source_config_mock.go --inpackage
 type ISourceConfig interface {
 	SourceSettingFromConfig(data map[string]interface{}) ISourceSettings
-	SourceSettingFromFlags(cmd *cobra.Command, original ISourceSettings) (ISourceSettings, error)
+	SourceSettingFromFlags(cmd ICommand, original ISourceSettings) (ISourceSettings, error)
 	GetIDFromURL(url string) (string, error)
 }

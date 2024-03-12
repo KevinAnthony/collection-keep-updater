@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
-	"github.com/kevinanthony/collection-keep-updater/source/kodansha"
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
@@ -13,7 +12,6 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/utils"
 
 	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -33,7 +31,7 @@ const (
 	seriesBlacklistF = "blacklist"
 )
 
-func seriesSetFlags(cmd *cobra.Command) {
+func seriesSetFlags(cmd types.ICommand) {
 	cmd.Flags().StringVar(&seriesNameV, seriesNameF, "", "name of the series.")
 	cmd.Flags().StringVar(&seriesKeyV, seriesKeyF, "", "unique key of the series.")
 	cmd.Flags().StringVar(&seriesURLV, seriesURLF, "", "url to be parsed for the series, extracting the ID.")
@@ -43,14 +41,13 @@ func seriesSetFlags(cmd *cobra.Command) {
 	viz.SetFlags(cmd)
 	wikipedia.SetFlags(cmd)
 	yen.SetFlags(cmd)
-	kodansha.SetFlags(cmd)
 }
 
-func newSeriesConfig(cmd *cobra.Command) (types.Series, error) {
+func newSeriesConfig(cmd types.ICommand) (types.Series, error) {
 	return seriesConfigFromFlags(cmd, types.Series{})
 }
 
-func editSeries(cmd *cobra.Command, cfg types.Config) (*types.Series, error) {
+func editSeries(cmd types.ICommand, cfg types.Config) (*types.Series, error) {
 	key := utils.GetFlagOrDefault[string](cmd, seriesKeyF, seriesKeyV, "")
 	if len(key) == 0 {
 		return nil, errors.New("key flag is required for edit")
@@ -77,7 +74,7 @@ func editSeries(cmd *cobra.Command, cfg types.Config) (*types.Series, error) {
 	return &s, nil
 }
 
-func seriesConfigFromFlags(cmd *cobra.Command, series types.Series) (types.Series, error) {
+func seriesConfigFromFlags(cmd types.ICommand, series types.Series) (types.Series, error) {
 	series.Name = utils.GetFlagOrDefault[string](cmd, seriesNameF, seriesNameV, series.Name)
 	series.Key = utils.GetFlagOrDefault[string](cmd, seriesKeyF, seriesKeyV, series.Key)
 	series.Source = types.SourceType(utils.GetFlagOrDefault[string](cmd, seriesSourceF, seriesSourceV, string(series.Source)))
@@ -114,7 +111,7 @@ func seriesConfigFromFlags(cmd *cobra.Command, series types.Series) (types.Serie
 	return series, nil
 }
 
-func SeriesConfigHookFunc(cmd *cobra.Command) viper.DecoderConfigOption {
+func SeriesConfigHookFunc(cmd types.ICommand) viper.DecoderConfigOption {
 	return viper.DecodeHook(func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
 		if f.Kind() != reflect.Map {
 			return data, nil
@@ -145,7 +142,7 @@ func SeriesConfigHookFunc(cmd *cobra.Command) viper.DecoderConfigOption {
 	)
 }
 
-func getSetting(cmd *cobra.Command, key types.SourceType, data map[string]interface{}) types.ISourceSettings {
+func getSetting(cmd types.ICommand, key types.SourceType, data map[string]interface{}) types.ISourceSettings {
 	if len(data) == 0 {
 		return nil
 	}

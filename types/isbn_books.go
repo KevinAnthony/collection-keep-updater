@@ -4,7 +4,6 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/out"
 
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/spf13/cobra"
 )
 
 type ISBNBooks []ISBNBook
@@ -60,8 +59,8 @@ func (b ISBNBooks) RemoveAt(i int) ISBNBooks {
 	return append(b[:i], b[i+1:]...)
 }
 
-func (b ISBNBooks) Print(cmd *cobra.Command) error {
-	t := out.NewTable(cmd)
+func (b ISBNBooks) Print(cmd ICommand) error {
+	t := out.NewTable(cmd.OutOrStdout())
 	t.AppendHeader(table.Row{"Title", "Volume", "ISBN 10", "ISBN 13", "Source"})
 	for _, book := range b {
 		t.AppendRow(table.Row{book.Title, book.Volume, book.ISBN10, book.ISBN13, book.Source})

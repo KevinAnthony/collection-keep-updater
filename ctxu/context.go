@@ -14,7 +14,6 @@ import (
 	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 )
 
 type ctxKey string
@@ -26,7 +25,7 @@ const (
 	httpKey      ctxKey = "http_ctx_key"
 )
 
-func SetConfig(cmd *cobra.Command, cfg types.Config) {
+func SetConfig(cmd types.ICommand, cfg types.Config) {
 	ctx := cmd.Context()
 
 	ctx = context.WithValue(ctx, configKey, cfg)
@@ -34,7 +33,7 @@ func SetConfig(cmd *cobra.Command, cfg types.Config) {
 	cmd.SetContext(ctx)
 }
 
-func GetConfig(cmd *cobra.Command) (types.Config, error) {
+func GetConfig(cmd types.ICommand) (types.Config, error) {
 	value := cmd.Context().Value(configKey)
 	if cfg, ok := value.(types.Config); ok {
 		return cfg, nil
@@ -43,7 +42,7 @@ func GetConfig(cmd *cobra.Command) (types.Config, error) {
 	return types.Config{}, errors.New("configuration not found in context")
 }
 
-func SetDI(cmd *cobra.Command) {
+func SetDI(cmd types.ICommand) {
 	ctx := cmd.Context()
 
 	httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
@@ -61,7 +60,7 @@ func SetDI(cmd *cobra.Command) {
 	cmd.SetContext(ctx)
 }
 
-func SetLibSettings(cmd *cobra.Command, cfg types.Config) {
+func SetLibSettings(cmd types.ICommand, cfg types.Config) {
 	ctx := cmd.Context()
 
 	httpClient, ok := ctx.Value(httpKey).(http.Client)
@@ -82,7 +81,7 @@ func SetLibSettings(cmd *cobra.Command, cfg types.Config) {
 	cmd.SetContext(ctx)
 }
 
-func GetLibraries(cmd *cobra.Command) (map[types.LibraryType]types.ILibrary, error) {
+func GetLibraries(cmd types.ICommand) (map[types.LibraryType]types.ILibrary, error) {
 	value := cmd.Context().Value(librariesKey)
 	if lib, ok := value.(map[types.LibraryType]types.ILibrary); ok {
 		return lib, nil
@@ -91,7 +90,7 @@ func GetLibraries(cmd *cobra.Command) (map[types.LibraryType]types.ILibrary, err
 	return nil, errors.New("libraries not found in context")
 }
 
-func GetSources(cmd *cobra.Command) (map[types.SourceType]types.ISource, error) {
+func GetSources(cmd types.ICommand) (map[types.SourceType]types.ISource, error) {
 	value := cmd.Context().Value(sourcesKey)
 	if source, ok := value.(map[types.SourceType]types.ISource); ok {
 		return source, nil
@@ -100,7 +99,7 @@ func GetSources(cmd *cobra.Command) (map[types.SourceType]types.ISource, error) 
 	return nil, errors.New("sources not found in context")
 }
 
-func GetSourceSetting(cmd *cobra.Command, sourceType types.SourceType) (types.ISourceConfig, error) {
+func GetSourceSetting(cmd types.ICommand, sourceType types.SourceType) (types.ISourceConfig, error) {
 	value := cmd.Context().Value(sourcesKey)
 
 	sourceMap, ok := value.(map[types.SourceType]types.ISource)

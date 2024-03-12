@@ -14,11 +14,11 @@ import (
 var removeCmd = &cobra.Command{
 	Use:   "remove",
 	Short: "Remove a configuration",
-	RunE:  runRemove,
-	Args:  validateRemoveArgs,
+	RunE:  types.CmdRunE(runRemove),
+	Args:  types.CmdArgs(validateRemoveArgs),
 }
 
-func validateRemoveArgs(cmd *cobra.Command, args []string) error {
+func validateRemoveArgs(cmd types.ICommand, args []string) error {
 	if len(args) == 0 {
 		return errors.New("remove: key not provided")
 	}
@@ -26,7 +26,7 @@ func validateRemoveArgs(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runRemove(cmd *cobra.Command, args []string) error {
+func runRemove(cmd types.ICommand, args []string) error {
 	cfg, err := ctxu.GetConfig(cmd)
 	if err != nil {
 		return err

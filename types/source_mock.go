@@ -5,8 +5,6 @@ package types
 import (
 	context "context"
 
-	cobra "github.com/spf13/cobra"
-
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -82,15 +80,15 @@ func (_m *ISouceMock) SourceSettingFromConfig(data map[string]interface{}) ISour
 }
 
 // SourceSettingFromFlags provides a mock function with given fields: cmd, original
-func (_m *ISouceMock) SourceSettingFromFlags(cmd *cobra.Command, original ISourceSettings) (ISourceSettings, error) {
+func (_m *ISouceMock) SourceSettingFromFlags(cmd ICommand, original ISourceSettings) (ISourceSettings, error) {
 	ret := _m.Called(cmd, original)
 
 	var r0 ISourceSettings
 	var r1 error
-	if rf, ok := ret.Get(0).(func(*cobra.Command, ISourceSettings) (ISourceSettings, error)); ok {
+	if rf, ok := ret.Get(0).(func(ICommand, ISourceSettings) (ISourceSettings, error)); ok {
 		return rf(cmd, original)
 	}
-	if rf, ok := ret.Get(0).(func(*cobra.Command, ISourceSettings) ISourceSettings); ok {
+	if rf, ok := ret.Get(0).(func(ICommand, ISourceSettings) ISourceSettings); ok {
 		r0 = rf(cmd, original)
 	} else {
 		if ret.Get(0) != nil {
@@ -98,7 +96,7 @@ func (_m *ISouceMock) SourceSettingFromFlags(cmd *cobra.Command, original ISourc
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(*cobra.Command, ISourceSettings) error); ok {
+	if rf, ok := ret.Get(1).(func(ICommand, ISourceSettings) error); ok {
 		r1 = rf(cmd, original)
 	} else {
 		r1 = ret.Error(1)

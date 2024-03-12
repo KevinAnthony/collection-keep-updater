@@ -2,9 +2,9 @@ package wikipedia
 
 import (
 	"github.com/kevinanthony/collection-keep-updater/out"
+	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/spf13/cobra"
 )
 
 type wikiSettings struct {
@@ -14,8 +14,8 @@ type wikiSettings struct {
 	Table        []int   `json:"tables"        yaml:"tables"`
 }
 
-func (w wikiSettings) Print(cmd *cobra.Command) error {
-	t := out.NewTable(cmd)
+func (w wikiSettings) Print(cmd types.ICommand) error {
+	t := out.NewTable(cmd.OutOrStdout())
 	t.AppendHeader(table.Row{"Volume Column Name", "Title Column Name", "ISBN Column Title", "Tables On Page"})
 	t.AppendRow(
 		table.Row{

@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 
+	"github.com/kevinanthony/collection-keep-updater/types"
+
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 
 	"github.com/spf13/cobra"
@@ -17,7 +19,7 @@ var (
 var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "add a new configuration",
-	RunE:  runAdd,
+	RunE:  types.CmdRunE(runAdd),
 }
 
 func init() {
@@ -30,7 +32,7 @@ func init() {
 	seriesSetFlags(addCmd)
 }
 
-func runAdd(cmd *cobra.Command, args []string) error {
+func runAdd(cmd types.ICommand, args []string) error {
 	switch {
 	case isSeries:
 		s, err := newSeriesConfig(cmd)

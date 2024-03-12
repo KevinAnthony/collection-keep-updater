@@ -7,7 +7,6 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/utils"
 
 	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 )
 
 const (
@@ -37,7 +36,7 @@ func (s settingsHelper) GetIDFromURL(url string) (string, error) {
 	return strings.TrimPrefix(url, "https://en.wikipedia.org/wiki/"), nil
 }
 
-func (s settingsHelper) SourceSettingFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
+func (s settingsHelper) SourceSettingFromFlags(cmd types.ICommand, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
 	settings, ok := sourceSetting.(*wikiSettings)
 	if !ok {
 		settings = &wikiSettings{}
@@ -70,7 +69,7 @@ func (s settingsHelper) SourceSettingFromConfig(data map[string]interface{}) typ
 	return settings
 }
 
-func SetFlags(cmd *cobra.Command) {
+func SetFlags(cmd types.ICommand) {
 	cmd.PersistentFlags().StringVar(&volumeV, volumeF, "", "header of the column that has the volume number.")
 	cmd.PersistentFlags().StringVar(&titleV, titleF, "", "header of the column that has the title.")
 	cmd.PersistentFlags().StringVar(&isbnV, isbnF, "", "header of the column that has the ISBN number(required).")

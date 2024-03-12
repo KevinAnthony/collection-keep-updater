@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
+	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -12,7 +13,7 @@ import (
 var editCmd = &cobra.Command{
 	Use:   "edit",
 	Short: "edit an existing configuration",
-	RunE:  runEdit,
+	RunE:  types.CmdRunE(runEdit),
 }
 
 func init() {
@@ -25,7 +26,7 @@ func init() {
 	seriesSetFlags(editCmd)
 }
 
-func runEdit(cmd *cobra.Command, args []string) error {
+func runEdit(cmd types.ICommand, args []string) error {
 	cfg, err := ctxu.GetConfig(cmd)
 	if err != nil {
 		return err

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
+	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/spf13/cobra"
 )
@@ -12,7 +13,7 @@ var (
 	cmd = &cobra.Command{
 		Use:   "update",
 		Short: "Update Libraries based on sources",
-		RunE:  run,
+		RunE:  types.CmdRunE(run),
 	}
 
 	try   bool
@@ -31,7 +32,7 @@ func GetCmd() *cobra.Command {
 	return cmd
 }
 
-func run(cmd *cobra.Command, _ []string) error {
+func run(cmd types.ICommand, _ []string) error {
 	cfg, err := ctxu.GetConfig(cmd)
 	if err != nil {
 		return err
