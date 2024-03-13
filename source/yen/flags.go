@@ -1,12 +1,11 @@
 package yen
 
 import (
-	"errors"
 	"strings"
 
 	"github.com/kevinanthony/collection-keep-updater/types"
 
-	"github.com/spf13/cobra"
+	"github.com/pkg/errors"
 )
 
 type settingsHelper struct{}
@@ -15,7 +14,7 @@ func (s settingsHelper) SourceSettingFromConfig(_ map[string]interface{}) types.
 	return yenSettings{}
 }
 
-func (s settingsHelper) SourceSettingFromFlags(_ *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
+func (s settingsHelper) SourceSettingFromFlags(_ types.ICommand, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
 	settings, ok := sourceSetting.(*yenSettings)
 	if !ok {
 		settings = &yenSettings{}
@@ -35,5 +34,5 @@ func (s settingsHelper) GetIDFromURL(url string) (string, error) {
 	return strings.TrimPrefix(url, "https://yenpress.com/series/"), nil
 }
 
-func SetFlags(_ *cobra.Command) {
+func SetFlags(_ types.ICommand) {
 }

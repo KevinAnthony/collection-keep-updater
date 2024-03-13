@@ -1,15 +1,16 @@
 package out
 
 import (
+	"io"
+
 	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/spf13/cobra"
 )
 
 var AutoMergeRow = table.RowConfig{AutoMerge: true}
 
-func NewTable(cmd *cobra.Command) table.Writer {
+func NewTable(writer io.Writer) table.Writer {
 	t := table.NewWriter()
-	t.SetOutputMirror(cmd.OutOrStdout())
+	t.SetOutputMirror(writer)
 	t.SetStyle(table.StyleLight)
 
 	return t

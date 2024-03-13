@@ -1,8 +1,10 @@
 package utils
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/kevinanthony/collection-keep-updater/types"
+)
 
-func GetFlagOrDefault[T any](cmd *cobra.Command, key string, flagValue, defaultValue T) T {
+func GetFlagOrDefault[T any](cmd types.ICommand, key string, flagValue, defaultValue T) T {
 	flag := cmd.Flag(key)
 	if flag == nil {
 		return defaultValue

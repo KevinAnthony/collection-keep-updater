@@ -8,7 +8,6 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/utils"
 
 	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 )
 
 const (
@@ -23,12 +22,12 @@ var (
 
 type settingsHelper struct{}
 
-func SetFlags(cmd *cobra.Command) {
+func SetFlags(cmd types.ICommand) {
 	cmd.PersistentFlags().IntVar(&maxBacklogV, maxBacklogF, 0, "how many volumes from the end to check.")
 	cmd.PersistentFlags().StringVar(&getDelayV, getDelayF, "", "how long a delay to wait between each request, in go time.Duration format.")
 }
 
-func (v settingsHelper) SourceSettingFromFlags(cmd *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
+func (v settingsHelper) SourceSettingFromFlags(cmd types.ICommand, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
 	settings, ok := sourceSetting.(*vizSettings)
 	if !ok {
 		settings = &vizSettings{}

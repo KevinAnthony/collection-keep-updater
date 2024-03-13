@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -10,16 +9,17 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list one or all configurations",
-	RunE:  runList,
+	RunE:  types.CmdRunE(runList),
 }
 
-func runList(cmd *cobra.Command, args []string) error {
+func runList(cmd types.ICommand, args []string) error {
 	var settingsKey string
 	if len(args) > 0 {
 		settingsKey = args[0]
@@ -40,7 +40,7 @@ func runList(cmd *cobra.Command, args []string) error {
 	}
 }
 
-func printSeries(cmd *cobra.Command, cfg types.Config, key string) error {
+func printSeries(cmd types.ICommand, cfg types.Config, key string) error {
 	if len(key) == 0 {
 		return printSeriesBasic(cmd, cfg)
 	}
@@ -53,8 +53,8 @@ func printSeries(cmd *cobra.Command, cfg types.Config, key string) error {
 	return fmt.Errorf("key: %s not found in series configuration", key)
 }
 
-func printSeriesBasic(cmd *cobra.Command, cfg types.Config) error {
-	t := out.NewTable(cmd)
+func printSeriesBasic(cmd types.ICommand, cfg types.Config) error {
+	t := out.NewTable(cmd.OutOrStdout())
 	t.AppendHeader(table.Row{"Series"})
 	t.AppendHeader(table.Row{"Key", "Name", "ID", "Source Type"})
 
@@ -67,11 +67,11 @@ func printSeriesBasic(cmd *cobra.Command, cfg types.Config) error {
 	return nil
 }
 
-func printLibrary(cmd *cobra.Command, cfg types.Config, key string) error {
+func printLibrary(cmd types.ICommand, cfg types.Config, key string) error {
 	if len(key) == 0 {
 		return printLibraryBasic(cmd, cfg)
 	}
-	t := out.NewTable(cmd)
+	t := out.NewTable(cmd.OutOrStdout())
 	t.AppendHeader(table.Row{"Library", "Wanted Collection ID", "Other Collection IDs", "API Key"}, out.AutoMergeRow)
 
 	for _, l := range cfg.Libraries {
@@ -87,8 +87,8 @@ func printLibrary(cmd *cobra.Command, cfg types.Config, key string) error {
 	return fmt.Errorf("name: %s not found in library configuration", key)
 }
 
-func printLibraryBasic(cmd *cobra.Command, cfg types.Config) error {
-	t := out.NewTable(cmd)
+func printLibraryBasic(cmd types.ICommand, cfg types.Config) error {
+	t := out.NewTable(cmd.OutOrStdout())
 	t.AppendHeader(table.Row{"Library", "Wanted Collection ID", "Other Collection IDs", "API Key"}, out.AutoMergeRow)
 
 	for _, l := range cfg.Libraries {

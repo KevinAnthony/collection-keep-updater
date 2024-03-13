@@ -6,7 +6,6 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 )
 
 type settingsHelper struct{}
@@ -15,7 +14,7 @@ func (s settingsHelper) SourceSettingFromConfig(_ map[string]interface{}) types.
 	return kondashaSettings{}
 }
 
-func (s settingsHelper) SourceSettingFromFlags(_ *cobra.Command, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
+func (s settingsHelper) SourceSettingFromFlags(_ types.ICommand, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
 	settings, ok := sourceSetting.(*kondashaSettings)
 	if !ok {
 		settings = &kondashaSettings{}
@@ -36,5 +35,5 @@ func (s settingsHelper) GetIDFromURL(url string) (string, error) {
 	return strings.TrimPrefix(url, baseURL+seriesSlug), nil
 }
 
-func SetFlags(_ *cobra.Command) {
+func SetFlags(_ types.ICommand) {
 }
