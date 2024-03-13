@@ -21,4 +21,8 @@ jobs:
       - name: Test
         run: go test -v ./... -v -cover -coverprofile coverage.out
 
-      - uses: codecov/codecov-action@v3
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: KevinAnthony/collection-keep-updater
