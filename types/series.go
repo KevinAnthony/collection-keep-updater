@@ -40,7 +40,9 @@ func (s Series) Print(cmd ICommand) error {
 	}
 
 	if s.SourceSettings != nil {
-		s.SourceSettings.Print(cmd)
+		if err := s.SourceSettings.Print(cmd); err != nil {
+			return err
+		}
 	}
 
 	return nil
