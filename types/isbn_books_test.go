@@ -59,7 +59,6 @@ func TestISBNBooks_Diff(t *testing.T) {
 			actual := booksA.Diff(booksB)
 
 			So(actual, ShouldResemble, expected)
-
 		})
 	})
 }

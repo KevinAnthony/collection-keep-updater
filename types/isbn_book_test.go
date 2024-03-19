@@ -23,7 +23,6 @@ func TestISBNBook_Equals(t *testing.T) {
 	t.Parallel()
 
 	Convey("ISBNBook_Equals", t, func() {
-
 		bookA := types.ISBNBook{}
 		bookB := types.ISBNBook{}
 
