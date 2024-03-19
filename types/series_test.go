@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/pkg/errors"
-
 	"github.com/kevinanthony/collection-keep-updater/types"
 
+	"github.com/pkg/errors"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
