@@ -27,12 +27,7 @@ func (u updater) UpdateLibrary(_ context.Context, library types.ILibrary, availa
 		return nil, err
 	}
 
-	wanted, err := booksInLibrary.Diff(availableBooks)
-	if err != nil {
-		return nil, err
-	}
-
-	return wanted, nil
+	return availableBooks.Diff(booksInLibrary), nil
 }
 
 func (u updater) GetAllAvailableBooks(cmd types.ICommand, series []types.Series) (types.ISBNBooks, error) {

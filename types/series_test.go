@@ -67,10 +67,10 @@ func TestSeries_Print(t *testing.T) {
 					So(writer.String(), ShouldEqual, configTable)
 				})
 			})
-
-			cmdMock.AssertExpectations(t)
-			sourceSettingMock.AssertExpectations(t)
 		})
+
+		cmdMock.AssertExpectations(t)
+		sourceSettingMock.AssertExpectations(t)
 	})
 }
 

@@ -8,14 +8,22 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+const (
+	i10A = "0123456789"
+	i13A = "0123456789ABC"
+	i10B = "1234567890"
+	i13B = "123456789ABC0"
+	i10C = "2345678901"
+	i13C = "23456789ABC01"
+	i10D = "3456789012"
+	i13D = "3456789ABC012"
+)
+
 func TestISBNBook_Equals(t *testing.T) {
 	t.Parallel()
 
 	Convey("ISBNBook_Equals", t, func() {
-		i10A := "01231456789"
-		i10B := "12314567890"
-		i13A := "01231456789ABC"
-		i13B := "12314567890ABC0"
+
 		bookA := types.ISBNBook{}
 		bookB := types.ISBNBook{}
 
