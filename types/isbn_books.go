@@ -12,18 +12,18 @@ func NewISBNBooks(length int) ISBNBooks {
 	return make(ISBNBooks, 0, length)
 }
 
-func (b ISBNBooks) Diff(s ISBNBooks) (ISBNBooks, error) {
+func (b ISBNBooks) Diff(other ISBNBooks) ISBNBooks {
 	diff := NewISBNBooks(0)
 
-	for _, book := range s {
-		if b.Contains(book) {
+	for _, book := range b {
+		if other.Contains(book) {
 			continue
 		}
 
 		diff = append(diff, book)
 	}
 
-	return diff, nil
+	return diff
 }
 
 func (b ISBNBooks) Contains(book ISBNBook) bool {
@@ -36,7 +36,7 @@ func (b ISBNBooks) Contains(book ISBNBook) bool {
 	return false
 }
 
-func (b ISBNBooks) FindByISBN(isbn string) int {
+func (b ISBNBooks) FindIndexByISBN(isbn string) int {
 	var book ISBNBook
 	if len(isbn) == 10 {
 		book.ISBN10 = isbn
@@ -56,6 +56,10 @@ func (b ISBNBooks) FindByISBN(isbn string) int {
 }
 
 func (b ISBNBooks) RemoveAt(i int) ISBNBooks {
+	if i < 0 || i >= len(b) {
+		return b
+	}
+
 	return append(b[:i], b[i+1:]...)
 }
 

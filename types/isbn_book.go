@@ -12,13 +12,13 @@ type ISBNBook struct {
 	Source string
 }
 
-func (A ISBNBook) Equals(B ISBNBook) bool {
-	if len(A.ISBN13) > 0 && len(B.ISBN13) > 0 {
-		return strings.EqualFold(A.ISBN13, B.ISBN13)
+func (a ISBNBook) Equals(b ISBNBook) bool {
+	if len(a.ISBN13) > 0 && len(b.ISBN13) > 0 {
+		return strings.EqualFold(a.ISBN13, b.ISBN13)
 	}
 
-	if len(A.ISBN10) > 0 && len(B.ISBN10) > 0 {
-		return strings.EqualFold(A.ISBN10, B.ISBN10)
+	if len(a.ISBN10) > 0 && len(b.ISBN10) > 0 {
+		return strings.EqualFold(a.ISBN10, b.ISBN10)
 	}
 
 	return false
