@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/kevinanthony/collection-keep-updater/utils"
-	"golang.org/x/net/html"
 
 	. "github.com/smartystreets/goconvey/convey"
+	"golang.org/x/net/html"
 )
 
 func TestAttrContains(t *testing.T) {
