@@ -4,16 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/mock"
-
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/library/libib"
-
+	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
-	"github.com/kevinanthony/collection-keep-updater/ctxu"
-	"github.com/kevinanthony/collection-keep-updater/types"
-
 	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestSetConfig(t *testing.T) {
@@ -124,7 +121,6 @@ func TestGetLibraries(t *testing.T) {
 		})
 		Convey("should return error when", func() {
 			Convey("library is not in context", func() {
-
 				cmdCall.Return(context.Background())
 
 				_, err := ctxu.GetLibraries(cmdMock)
@@ -151,7 +147,6 @@ func TestSetDI(t *testing.T) {
 
 			ctxu.SetDI(cmdMock, httpMock, sources)
 		})
-
 	})
 }
 
