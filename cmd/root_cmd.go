@@ -30,13 +30,11 @@ Configure it with different sources and it will compare what you already have li
 )
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
 	rootCmd.AddCommand(config.GetCmd())
 	rootCmd.AddCommand(updater.GetCmd())
 }
 
-func initConfig() {
+func LoadConfig(cmd types.ICommand, _ []string) error {
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
@@ -49,10 +47,10 @@ func initConfig() {
 
 	viper.AutomaticEnv()
 
-	_ = viper.ReadInConfig()
-}
+	if err := viper.ReadInConfig(); err != nil {
+		return err
+	}
 
-func LoadConfig(cmd types.ICommand, _ []string) error {
 	httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
 
 	sources := map[types.SourceType]types.ISource{
