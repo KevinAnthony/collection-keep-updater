@@ -14,36 +14,36 @@ func Get[T any](data map[string]interface{}, key string) (out T) {
 	return cast
 }
 
-func GetPtr[T any](data map[string]interface{}, key string) (out *T) {
+func GetPtr[T any](data map[string]interface{}, key string) *T {
 	value, found := data[key]
 	if !found {
-		return out
+		return nil
 	}
 
 	cast, ok := value.(T)
 	if !ok {
-		return out
+		return nil
 	}
 
 	return &cast
 }
 
-func GetArray[T any](data map[string]interface{}, key string) (out []T) {
+func GetArray[T any](data map[string]interface{}, key string) []T {
 	value, found := data[key]
 	if !found {
-		return out
+		return nil
 	}
 
 	castArray, ok := value.([]interface{})
 	if !ok {
-		return out
+		return nil
 	}
 
 	tArray := make([]T, 0, len(castArray))
 	for _, v := range castArray {
 		cast, ok := v.(T)
 		if !ok {
-			return out
+			return nil
 		}
 
 		tArray = append(tArray, cast)
