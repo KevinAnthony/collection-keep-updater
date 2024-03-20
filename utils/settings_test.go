@@ -36,7 +36,6 @@ func TestGet(t *testing.T) {
 					actual := utils.Get[string](dict, "invalid")
 
 					So(actual, ShouldBeEmpty)
-
 				})
 				Convey("value in map does not match type", func() {
 					actual := utils.Get[string](dict, "int")
@@ -46,7 +45,6 @@ func TestGet(t *testing.T) {
 			})
 		})
 	})
-
 }
 
 func TestGetPtr(t *testing.T) {
@@ -77,7 +75,6 @@ func TestGetPtr(t *testing.T) {
 					actual := utils.GetPtr[string](dict, "invalid")
 
 					So(actual, ShouldBeNil)
-
 				})
 				Convey("value in map does not match type", func() {
 					actual := utils.GetPtr[string](dict, "int")
@@ -87,7 +84,6 @@ func TestGetPtr(t *testing.T) {
 			})
 		})
 	})
-
 }
 
 func TestGetArray(t *testing.T) {
@@ -142,7 +138,6 @@ func TestGetArray(t *testing.T) {
 			})
 		})
 	})
-
 }
 
 func getDict() map[string]interface{} {
