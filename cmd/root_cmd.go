@@ -70,7 +70,9 @@ func LoadConfig(cmd types.ICommand, _ []string) error {
 	}
 
 	ctxu.SetConfig(cmd, cfg)
-	ctxu.SetLibSettings(cmd, cfg)
+	if err := ctxu.SetLibraries(cmd, cfg); err != nil {
+		return err
+	}
 
 	return nil
 }
