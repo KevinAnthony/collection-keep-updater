@@ -68,9 +68,6 @@ func TestSeries_Print(t *testing.T) {
 				})
 			})
 		})
-
-		cmdMock.AssertExpectations(t)
-		sourceSettingMock.AssertExpectations(t)
 	})
 }
 

@@ -11,6 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+//go:generate mockery --srcpkg=context --name=Context --structname=ContextMock --filename=context_mock.go --output . --outpkg=ctxu
+
 type ContextKey string
 
 const (
@@ -46,12 +48,12 @@ func SetDI(cmd types.ICommand, httpClient http.Client, sources map[types.SourceT
 	cmd.SetContext(ctx)
 }
 
-func SetLibSettings(cmd types.ICommand, cfg types.Config) {
+func SetLibraries(cmd types.ICommand, cfg types.Config) error {
 	ctx := cmd.Context()
 
 	httpClient, ok := ctx.Value(httpKey).(http.Client)
 	if !ok {
-		panic("library not set in context")
+		return errors.New("http client not set in context")
 	}
 
 	libraries := map[types.LibraryType]types.ILibrary{}
@@ -65,6 +67,8 @@ func SetLibSettings(cmd types.ICommand, cfg types.Config) {
 	ctx = context.WithValue(ctx, librariesKey, libraries)
 
 	cmd.SetContext(ctx)
+
+	return nil
 }
 
 func GetLibraries(cmd types.ICommand) (map[types.LibraryType]types.ILibrary, error) {
@@ -93,17 +97,5 @@ func GetSource(cmd types.ICommand, sourceType types.SourceType) (types.ISource, 
 }
 
 func GetSourceSetting(cmd types.ICommand, sourceType types.SourceType) (types.ISourceConfig, error) {
-	value := cmd.Context().Value(sourcesKey)
-
-	sourceMap, ok := value.(map[types.SourceType]types.ISource)
-	if !ok {
-		return nil, errors.New("sources not found in context")
-	}
-
-	source, ok := sourceMap[sourceType]
-	if !ok {
-		return nil, fmt.Errorf("source type %s not found in sources map", sourceType)
-	}
-
-	return source, nil
+	return GetSource(cmd, sourceType)
 }

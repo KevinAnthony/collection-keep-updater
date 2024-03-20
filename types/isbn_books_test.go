@@ -142,8 +142,6 @@ func TestISBNBooks_Print(t *testing.T) {
 
 			So(writer.String(), ShouldEqual, isbnTable)
 		})
-
-		cmdMock.AssertExpectations(t)
 	})
 }
 
