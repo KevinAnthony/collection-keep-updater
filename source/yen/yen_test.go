@@ -5,6 +5,7 @@ import (
 
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
 	"github.com/kevinanthony/gorps/v2/http"
+
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -12,7 +13,6 @@ func TestNew(t *testing.T) {
 	t.Parallel()
 
 	Convey("New", t, func() {
-
 		client := http.NewClientMock(t)
 		Convey("should return isource when http client is valid", func() {
 			source, err := yen.New(client)

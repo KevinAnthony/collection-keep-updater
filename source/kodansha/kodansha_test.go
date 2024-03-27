@@ -6,23 +6,20 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pkg/errors"
-
-	"github.com/stretchr/testify/mock"
-
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
-	"github.com/kevinanthony/collection-keep-updater/types"
-
 	"github.com/kevinanthony/collection-keep-updater/source/kodansha"
+	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
+
+	"github.com/pkg/errors"
 	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestNew(t *testing.T) {
 	t.Parallel()
 
 	Convey("New", t, func() {
-
 		client := http.NewClientMock(t)
 		Convey("should return isource when http client is valid", func() {
 			source, err := kodansha.New(client)
@@ -158,5 +155,4 @@ func TestKodansha_GetISBNs(t *testing.T) {
 			})
 		})
 	})
-
 }
