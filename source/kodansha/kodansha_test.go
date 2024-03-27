@@ -60,7 +60,6 @@ func TestKodansha_GetISBNs(t *testing.T) {
 		})).Maybe()
 
 		Convey("should return valid isbn", func() {
-
 			seriesCall.Return(os.Open(getPath(t, "series.html")))
 			page1Call.Return(os.Open(getPath(t, "page_1.html")))
 
