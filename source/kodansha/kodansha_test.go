@@ -3,6 +3,7 @@ package kodansha_test
 import (
 	native "net/http"
 	"os"
+	"path"
 	"strings"
 	"testing"
 
@@ -59,8 +60,9 @@ func TestKodansha_GetISBNs(t *testing.T) {
 		})).Maybe()
 
 		Convey("should return valid isbn", func() {
-			seriesCall.Return(os.Open("./test/kodansha/series.html"))
-			page1Call.Return(os.Open("./test/kodansha/page_1.html"))
+
+			seriesCall.Return(os.Open(getPath(t, "series.html")))
+			page1Call.Return(os.Open(getPath(t, "page_1.html")))
 
 			books, err := source.GetISBNs(ctx, types.Series{ID: id})
 
@@ -68,7 +70,7 @@ func TestKodansha_GetISBNs(t *testing.T) {
 			So(books, ShouldResemble, expected)
 		})
 		Convey("should return nil error when series page does not contain any links to the walk page returns nil", func() {
-			seriesCall.Return(os.Open("./test/kodansha/series_missing_link.html"))
+			seriesCall.Return(os.Open(getPath(t, "series_missing_link.html")))
 
 			books, err := source.GetISBNs(ctx, types.Series{ID: id})
 
@@ -101,7 +103,7 @@ func TestKodansha_GetISBNs(t *testing.T) {
 				So(books, ShouldBeNil)
 			})
 			Convey("book page is invalid and create request fails", func() {
-				seriesCall.Return(os.Open("./test/kodansha/series_bad_url.html"))
+				seriesCall.Return(os.Open(getPath(t, "series_bad_url.html")))
 
 				books, err := source.GetISBNs(ctx, types.Series{ID: id})
 
@@ -110,7 +112,7 @@ func TestKodansha_GetISBNs(t *testing.T) {
 				So(books, ShouldBeNil)
 			})
 			Convey("book page do request fails", func() {
-				seriesCall.Return(os.Open("./test/kodansha/series.html"))
+				seriesCall.Return(os.Open(getPath(t, "series.html")))
 				page1Call.Return(nil, errors.New("page request error"))
 
 				books, err := source.GetISBNs(ctx, types.Series{ID: id})
@@ -119,7 +121,7 @@ func TestKodansha_GetISBNs(t *testing.T) {
 				So(books, ShouldBeNil)
 			})
 			Convey("book page html parse fails", func() {
-				seriesCall.Return(os.Open("./test/kodansha/series.html"))
+				seriesCall.Return(os.Open(getPath(t, "series.html")))
 				bodyMock.On("Read", mock.Anything).Return(0, errors.New("everybody body mock"))
 				page1Call.Return(bodyMock, nil)
 
@@ -133,8 +135,8 @@ func TestKodansha_GetISBNs(t *testing.T) {
 			Convey("get volume fails because", func() {
 				expected[0].Volume = ""
 				Convey("url does not contain enough dashes", func() {
-					seriesCall.Return(os.Open("./test/kodansha/series_volume_bad_url.html"))
-					page1Call.Return(os.Open("./test/kodansha/page_1.html"))
+					seriesCall.Return(os.Open(getPath(t, "series_volume_bad_url.html")))
+					page1Call.Return(os.Open(getPath(t, "page_1.html")))
 
 					books, err := source.GetISBNs(ctx, types.Series{ID: id})
 
@@ -142,10 +144,10 @@ func TestKodansha_GetISBNs(t *testing.T) {
 					So(books, ShouldResemble, expected)
 				})
 				Convey("volume is not a number", func() {
-					seriesCall.Return(os.Open("./test/kodansha/series_volume_bad_number.html"))
+					seriesCall.Return(os.Open(getPath(t, "series_volume_bad_number.html")))
 					client.On("Do", mock.MatchedBy(func(req *native.Request) bool {
 						return strings.HasSuffix(req.URL.String(), "initial-d-omnibus-1x")
-					})).Return(os.Open("./test/kodansha/page_1.html"))
+					})).Return(os.Open(getPath(t, "page_1.html")))
 
 					books, err := source.GetISBNs(ctx, types.Series{ID: id})
 
@@ -155,4 +157,17 @@ func TestKodansha_GetISBNs(t *testing.T) {
 			})
 		})
 	})
+}
+
+func getPath(t *testing.T, fileName string) string {
+	t.Helper()
+
+	wd, err := os.Getwd()
+	So(err, ShouldBeNil)
+
+	if !strings.HasSuffix(wd, path.Join("source", "kodansha")) {
+		return path.Join(wd, "source", "kodansha", "test_fixtures", fileName)
+	}
+
+	return path.Join(wd, "test_fixtures", fileName)
 }
