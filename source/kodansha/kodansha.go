@@ -1,7 +1,6 @@
 package kodansha
 
 import (
-	"bytes"
 	"context"
 	"strconv"
 	"strings"
@@ -25,15 +24,15 @@ type kodansha struct {
 	client http.Client
 }
 
-func New(client http.Client) types.ISource {
+func New(client http.Client) (types.ISource, error) {
 	if client == nil {
-		panic("http client is nil")
+		return nil, errors.New("http client is nil")
 	}
 
 	return kodansha{
 		settingsHelper: settingsHelper{},
 		client:         client,
-	}
+	}, nil
 }
 
 func (k kodansha) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
@@ -51,7 +50,7 @@ func (k kodansha) GetISBNs(ctx context.Context, series types.Series) (types.ISBN
 		return nil, err
 	}
 
-	node, err := html.Parse(bytes.NewReader(body))
+	node, err := html.Parse(body)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +60,7 @@ func (k kodansha) GetISBNs(ctx context.Context, series types.Series) (types.ISBN
 	books := types.NewISBNBooks(len(pages))
 
 	for _, page := range pages {
-		if book, err := k.getBookFromSeriesPage(ctx, series, page); err != nil {
+		if book, err := k.getBookFromSeriesPage(ctx, page); err != nil {
 			return nil, errors.Wrap(err, page)
 		} else if book != nil {
 			books = append(books, *book)
@@ -102,7 +101,7 @@ func (k kodansha) extractDetails(node *html.Node) string {
 	return ""
 }
 
-func (k kodansha) getBookFromSeriesPage(ctx context.Context, series types.Series, path string) (*types.ISBNBook, error) {
+func (k kodansha) getBookFromSeriesPage(ctx context.Context, path string) (*types.ISBNBook, error) {
 	req, err := http.
 		NewRequest(k.client).
 		Get().
@@ -117,7 +116,7 @@ func (k kodansha) getBookFromSeriesPage(ctx context.Context, series types.Series
 		return nil, err
 	}
 
-	node, err := html.Parse(bytes.NewReader(body))
+	node, err := html.Parse(body)
 	if err != nil {
 		return nil, err
 	}

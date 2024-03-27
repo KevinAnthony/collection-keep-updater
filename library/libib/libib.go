@@ -104,7 +104,7 @@ func (l libIB) getCSV(ctx context.Context, libraryID string) ([]libibCSVEntries,
 
 	var library []libibCSVEntries
 
-	if err := gocsv.UnmarshalBytes(body, &library); err != nil { // Load clients from file
+	if err := gocsv.Unmarshal(body, &library); err != nil { // Load clients from file
 		return nil, err
 	}
 

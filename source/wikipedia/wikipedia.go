@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 	"github.com/kevinanthony/gorps/v2/http"
@@ -23,15 +25,15 @@ type wikiSource struct {
 	client http.Client
 }
 
-func New(client http.Client) types.ISource {
+func New(client http.Client) (types.ISource, error) {
 	if client == nil {
-		panic("http client is nil")
+		return nil, errors.New("http client is nil")
 	}
 
 	return wikiSource{
 		settingsHelper: settingsHelper{},
 		client:         client,
-	}
+	}, nil
 }
 
 func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
