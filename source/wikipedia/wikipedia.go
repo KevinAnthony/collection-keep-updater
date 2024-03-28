@@ -12,6 +12,7 @@ import (
 	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/atye/wikitable2json/pkg/client"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -23,15 +24,15 @@ type wikiSource struct {
 	client http.Client
 }
 
-func New(client http.Client) types.ISource {
+func New(client http.Client) (types.ISource, error) {
 	if client == nil {
-		panic("http client is nil")
+		return nil, errors.New("http client is nil")
 	}
 
 	return wikiSource{
 		settingsHelper: settingsHelper{},
 		client:         client,
-	}
+	}, nil
 }
 
 func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {

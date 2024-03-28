@@ -53,11 +53,30 @@ func LoadConfig(cmd types.ICommand, _ []string) error {
 
 	httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
 
-	sources := map[types.SourceType]types.ISource{
-		types.WikipediaSource: wikipedia.New(httpClient),
-		types.VizSource:       viz.New(httpClient),
-		types.YenSource:       yen.New(httpClient),
-		types.Kodansha:        kodansha.New(httpClient),
+	sources := map[types.SourceType]types.ISource{}
+
+	if wiki, err := wikipedia.New(httpClient); err != nil {
+		return err
+	} else {
+		sources[types.WikipediaSource] = wiki
+	}
+
+	if viz, err := viz.New(httpClient); err != nil {
+		return err
+	} else {
+		sources[types.VizSource] = viz
+	}
+
+	if yen, err := yen.New(httpClient); err != nil {
+		return err
+	} else {
+		sources[types.YenSource] = yen
+	}
+
+	if kodansha, err := kodansha.New(httpClient); err != nil {
+		return err
+	} else {
+		sources[types.Kodansha] = kodansha
 	}
 
 	ctxu.SetDI(cmd, httpClient, sources)
