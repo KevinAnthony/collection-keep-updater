@@ -3,7 +3,7 @@ package kodansha_test
 import (
 	native "net/http"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -164,9 +164,9 @@ func getPath(t *testing.T, fileName string) string {
 	wd, err := os.Getwd()
 	So(err, ShouldBeNil)
 
-	if !strings.HasSuffix(wd, path.Join("source", "kodansha")) {
-		return path.Join(wd, "source", "kodansha", "test_fixtures", fileName)
+	if !strings.HasSuffix(wd, filepath.Join("source", "kodansha")) {
+		return filepath.Join(wd, "source", "kodansha", "test_fixtures", fileName)
 	}
 
-	return path.Join(wd, "test_fixtures", fileName)
+	return filepath.Join(wd, "test_fixtures", fileName)
 }
