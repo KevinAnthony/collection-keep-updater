@@ -3,10 +3,17 @@ package updater
 import (
 	"fmt"
 
+	"github.com/kevinanthony/collection-keep-updater/utils"
+
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
 
 	"github.com/spf13/cobra"
+)
+
+const (
+	printF = "print-config"
+	writeF = "write-config"
 )
 
 var (
@@ -15,14 +22,11 @@ var (
 		Short: "Update Libraries based on sources",
 		RunE:  types.CmdRunE(run),
 	}
-
-	try   bool
-	write bool
 )
 
 func init() {
-	cmd.PersistentFlags().BoolVarP(&try, "print-config", "p", false, "run wanted and output the results.")
-	cmd.PersistentFlags().BoolVarP(&write, "write-config", "w", false, "save the configuration to the library.")
+	cmd.PersistentFlags().BoolP(printF, "p", false, "run wanted and output the results.")
+	cmd.PersistentFlags().BoolP(writeF, "w", false, "save the configuration to the library.")
 
 	cmd.MarkFlagsOneRequired("print-config", "write-config")
 	cmd.MarkFlagsMutuallyExclusive("print-config", "write-config")
@@ -61,11 +65,11 @@ func run(cmd types.ICommand, _ []string) error {
 			fmt.Println("No New Wanted books")
 
 			continue
-		case try:
+		case utils.GetFlagBool(cmd, printF):
 			if err := wanted.Print(cmd); err != nil {
 				return err
 			}
-		case write:
+		case utils.GetFlagBool(cmd, writeF):
 			if err := library.SaveWanted(wanted); err != nil {
 				return err
 			}

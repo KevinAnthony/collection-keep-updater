@@ -78,7 +78,7 @@ func TestSettingsHelper_GetIDFromURL(t *testing.T) {
 				id, err := source.GetIDFromURL("")
 
 				So(id, ShouldBeEmpty)
-				So(err, ShouldBeError, "unknown/unset url.  url is required")
+				So(err, ShouldBeError, "unknown/unset url. url is required")
 			})
 			Convey("url is malformed", func() {
 				id, err := source.GetIDFromURL("???")

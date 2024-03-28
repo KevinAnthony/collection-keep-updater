@@ -5,6 +5,7 @@ import (
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
+	"github.com/kevinanthony/collection-keep-updater/utils"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -35,9 +36,9 @@ func runRemove(cmd types.ICommand, args []string) error {
 	settingsKey := args[0]
 
 	switch {
-	case isSeries:
+	case utils.GetFlagBool(cmd, seriesFlag):
 		return removeSeries(cfg, settingsKey)
-	case isLibrary:
+	case utils.GetFlagBool(cmd, libraryFlag):
 		return removeLibrary(cfg, settingsKey)
 	default:
 		return errors.New("unknown configuration type")

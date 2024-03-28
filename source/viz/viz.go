@@ -78,7 +78,7 @@ func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks
 
 		if book, err := v.getBookFromSeriesPage(ctx, series, page); err != nil {
 			return nil, errors.Wrap(err, page)
-		} else if book != nil {
+		} else if book != nil && len(book.ISBN13) > 0 {
 			books = append(books, *book)
 		}
 	}
@@ -166,9 +166,9 @@ func getISBNFromBody(node *html.Node) string {
 	}
 
 	for child := node.FirstChild; child != nil; child = child.NextSibling {
-		title := getISBNFromBody(child)
-		if len(title) > 0 {
-			return title
+		isbn := getISBNFromBody(child)
+		if len(isbn) > 0 {
+			return isbn
 		}
 	}
 
