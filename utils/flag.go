@@ -7,7 +7,7 @@ import (
 func GetFlagString(cmd types.ICommand, key string) string {
 	str, err := cmd.PersistentFlags().GetString(key)
 	if err != nil {
-		//TODO log to console
+		// TODO log to console
 		return ""
 	}
 
@@ -23,7 +23,7 @@ func GetFlagStringPtr(cmd types.ICommand, key string) *string {
 func GetFlagStringSlice(cmd types.ICommand, key string) []string {
 	str, err := cmd.PersistentFlags().GetStringSlice(key)
 	if err != nil {
-		//TODO log to console
+		// TODO log to console
 		return nil
 	}
 
@@ -33,7 +33,7 @@ func GetFlagStringSlice(cmd types.ICommand, key string) []string {
 func GetFlagInt(cmd types.ICommand, key string) int {
 	i, err := cmd.PersistentFlags().GetInt(key)
 	if err != nil {
-		//TODO log to console
+		// TODO log to console
 		return 0
 	}
 
@@ -49,7 +49,7 @@ func GetFlagIntPtr(cmd types.ICommand, key string) *int {
 func GetFlagIntSlice(cmd types.ICommand, key string) []int {
 	i, err := cmd.PersistentFlags().GetIntSlice(key)
 	if err != nil {
-		//TODO log to console
+		// TODO log to console
 		return nil
 	}
 
@@ -59,7 +59,7 @@ func GetFlagIntSlice(cmd types.ICommand, key string) []int {
 func GetFlagBool(cmd types.ICommand, key string) bool {
 	b, err := cmd.PersistentFlags().GetBool(key)
 	if err != nil {
-		//TODO log to console
+		// TODO log to console
 		return false
 	}
 

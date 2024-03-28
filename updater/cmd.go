@@ -3,10 +3,9 @@ package updater
 import (
 	"fmt"
 
-	"github.com/kevinanthony/collection-keep-updater/utils"
-
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
+	"github.com/kevinanthony/collection-keep-updater/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -16,13 +15,11 @@ const (
 	writeF = "write-config"
 )
 
-var (
-	cmd = &cobra.Command{
-		Use:   "update",
-		Short: "Update Libraries based on sources",
-		RunE:  types.CmdRunE(run),
-	}
-)
+var cmd = &cobra.Command{
+	Use:   "update",
+	Short: "Update Libraries based on sources",
+	RunE:  types.CmdRunE(run),
+}
 
 func init() {
 	cmd.PersistentFlags().BoolP(printF, "p", false, "run wanted and output the results.")

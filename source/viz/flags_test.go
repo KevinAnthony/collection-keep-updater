@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/spf13/pflag"
-
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
-
 	"github.com/kevinanthony/collection-keep-updater/types"
 
 	. "github.com/smartystreets/goconvey/convey"
+	"github.com/spf13/pflag"
 )
 
 func TestSetFlags(t *testing.T) {

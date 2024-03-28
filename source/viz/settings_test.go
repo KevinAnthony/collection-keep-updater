@@ -7,6 +7,7 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
+
 	. "github.com/smartystreets/goconvey/convey"
 )
 
