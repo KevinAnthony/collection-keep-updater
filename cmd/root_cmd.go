@@ -12,6 +12,7 @@ import (
 	"github.com/kevinanthony/gorps/v2/encoder"
 	"github.com/kevinanthony/gorps/v2/http"
 
+	"github.com/atye/wikitable2json/pkg/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -52,10 +53,10 @@ func LoadConfig(cmd types.ICommand, _ []string) error {
 	}
 
 	httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
-
+	wikiGetter := client.NewTableGetter("keep-updater")
 	sources := map[types.SourceType]types.ISource{}
 
-	if wiki, err := wikipedia.New(httpClient); err != nil {
+	if wiki, err := wikipedia.New(httpClient, wikiGetter); err != nil {
 		return err
 	} else {
 		sources[types.WikipediaSource] = wiki
