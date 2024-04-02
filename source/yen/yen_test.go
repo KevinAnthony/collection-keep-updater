@@ -7,16 +7,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pkg/errors"
-
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
-	"github.com/kevinanthony/collection-keep-updater/types"
-	"github.com/stretchr/testify/mock"
-
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
+	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
+	"github.com/pkg/errors"
 	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestNew(t *testing.T) {
