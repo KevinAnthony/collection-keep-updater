@@ -77,7 +77,7 @@ func printLibrary(cmd types.ICommand, cfg types.Config, key string) error {
 
 	for _, l := range cfg.Libraries {
 		if string(l.Name) == key {
-			t.AppendRow(table.Row{l.Name, l.WantedColID, strings.Join(l.OtherColIDs, ","), out.Partial(l.APIKey, 50)})
+			t.AppendRow(table.Row{l.Name, l.WantedColID, strings.Join(l.OtherColIDs, ","), out.Partial(l.APIKey, 5)})
 
 			t.Render()
 
@@ -93,7 +93,7 @@ func printLibraryBasic(cmd types.ICommand, cfg types.Config) error {
 	t.AppendHeader(table.Row{"Library", "Wanted Collection ID", "Other Collection IDs", "API Key"}, out.AutoMergeRow)
 
 	for _, l := range cfg.Libraries {
-		t.AppendRow(table.Row{l.Name, l.WantedColID, strings.Join(l.OtherColIDs, ","), out.Partial(l.APIKey, 50)})
+		t.AppendRow(table.Row{l.Name, l.WantedColID, strings.Join(l.OtherColIDs, ","), out.Partial(l.APIKey, 5)})
 	}
 
 	t.Render()
