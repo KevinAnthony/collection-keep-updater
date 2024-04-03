@@ -23,8 +23,8 @@ func IntSliceToStrOrEmpty(i []int) string {
 
 func Partial(s string, i int) string {
 	if len(s) < i {
-		return s
+		return "..."
 	}
 
-	return s[0:i-3] + "..."
+	return s[0:i] + "..."
 }

@@ -1,7 +1,6 @@
 package yen
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"net/url"
@@ -13,6 +12,7 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/utils"
 	"github.com/kevinanthony/gorps/v2/http"
 
+	"github.com/pkg/errors"
 	"golang.org/x/net/html"
 )
 
@@ -28,15 +28,15 @@ type yen struct {
 	client http.Client
 }
 
-func New(client http.Client) types.ISource {
+func New(client http.Client) (types.ISource, error) {
 	if client == nil {
-		panic("http client is nil")
+		return nil, errors.New("http client is nil")
 	}
 
 	return yen{
 		settingsHelper: settingsHelper{},
 		client:         client,
-	}
+	}, nil
 }
 
 func (y yen) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
@@ -86,7 +86,7 @@ func (y yen) callGetMore(ctx context.Context, series types.Series, next string) 
 		return nil, err
 	}
 
-	node, err := html.Parse(bytes.NewReader(body))
+	node, err := html.Parse(body)
 	if err != nil {
 		return nil, err
 	}

@@ -1,7 +1,6 @@
 package viz
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"strconv"
@@ -26,15 +25,15 @@ type viz struct {
 	client http.Client
 }
 
-func New(client http.Client) types.ISource {
+func New(client http.Client) (types.ISource, error) {
 	if client == nil {
-		panic("http client is nil")
+		return nil, errors.New("http client is nil")
 	}
 
 	return viz{
 		settingsHelper: settingsHelper{},
 		client:         client,
-	}
+	}, nil
 }
 
 func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
@@ -57,7 +56,7 @@ func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks
 		return nil, err
 	}
 
-	node, err := html.Parse(bytes.NewReader(body))
+	node, err := html.Parse(body)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +78,7 @@ func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks
 
 		if book, err := v.getBookFromSeriesPage(ctx, series, page); err != nil {
 			return nil, errors.Wrap(err, page)
-		} else if book != nil {
+		} else if book != nil && len(book.ISBN13) > 0 {
 			books = append(books, *book)
 		}
 	}
@@ -129,7 +128,7 @@ func (v viz) getBookFromSeriesPage(ctx context.Context, series types.Series, pat
 		return nil, err
 	}
 
-	node, err := html.Parse(bytes.NewReader(body))
+	node, err := html.Parse(body)
 	if err != nil {
 		return nil, err
 	}
@@ -167,9 +166,9 @@ func getISBNFromBody(node *html.Node) string {
 	}
 
 	for child := node.FirstChild; child != nil; child = child.NextSibling {
-		title := getISBNFromBody(child)
-		if len(title) > 0 {
-			return title
+		isbn := getISBNFromBody(child)
+		if len(isbn) > 0 {
+			return isbn
 		}
 	}
 

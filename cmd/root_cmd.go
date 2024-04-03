@@ -12,6 +12,7 @@ import (
 	"github.com/kevinanthony/gorps/v2/encoder"
 	"github.com/kevinanthony/gorps/v2/http"
 
+	"github.com/atye/wikitable2json/pkg/client"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -52,12 +53,31 @@ func LoadConfig(cmd types.ICommand, _ []string) error {
 	}
 
 	httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
+	wikiGetter := client.NewTableGetter("keep-updater")
+	sources := map[types.SourceType]types.ISource{}
 
-	sources := map[types.SourceType]types.ISource{
-		types.WikipediaSource: wikipedia.New(httpClient),
-		types.VizSource:       viz.New(httpClient),
-		types.YenSource:       yen.New(httpClient),
-		types.Kodansha:        kodansha.New(httpClient),
+	if wiki, err := wikipedia.New(httpClient, wikiGetter); err != nil {
+		return err
+	} else {
+		sources[types.WikipediaSource] = wiki
+	}
+
+	if viz, err := viz.New(httpClient); err != nil {
+		return err
+	} else {
+		sources[types.VizSource] = viz
+	}
+
+	if yen, err := yen.New(httpClient); err != nil {
+		return err
+	} else {
+		sources[types.YenSource] = yen
+	}
+
+	if kodansha, err := kodansha.New(httpClient); err != nil {
+		return err
+	} else {
+		sources[types.Kodansha] = kodansha
 	}
 
 	ctxu.SetDI(cmd, httpClient, sources)

@@ -48,22 +48,6 @@ func (_m *ICommandMock) Flag(name string) *pflag.Flag {
 	return r0
 }
 
-// Flags provides a mock function with given fields:
-func (_m *ICommandMock) Flags() *pflag.FlagSet {
-	ret := _m.Called()
-
-	var r0 *pflag.FlagSet
-	if rf, ok := ret.Get(0).(func() *pflag.FlagSet); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*pflag.FlagSet)
-		}
-	}
-
-	return r0
-}
-
 // OutOrStdout provides a mock function with given fields:
 func (_m *ICommandMock) OutOrStdout() io.Writer {
 	ret := _m.Called()

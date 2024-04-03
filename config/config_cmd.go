@@ -14,18 +14,13 @@ var configCmd = &cobra.Command{
 	Short: "Manage configurations",
 }
 
-var (
-	isSeries  bool
-	isLibrary bool
-)
-
 func GetCmd() *cobra.Command {
 	return configCmd
 }
 
 func init() {
-	configCmd.PersistentFlags().BoolVarP(&isSeries, seriesFlag, "s", false, "List one or all series configurations")
-	configCmd.PersistentFlags().BoolVarP(&isLibrary, libraryFlag, "l", false, "List one or all library configurations")
+	configCmd.PersistentFlags().BoolP(seriesFlag, "s", false, "List one or all series configurations")
+	configCmd.PersistentFlags().BoolP(libraryFlag, "l", false, "List one or all library configurations")
 	configCmd.MarkFlagsOneRequired(seriesFlag, libraryFlag)
 	configCmd.MarkFlagsMutuallyExclusive(seriesFlag, libraryFlag)
 

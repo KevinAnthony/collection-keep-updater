@@ -3,14 +3,15 @@ package config
 import (
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
+	"github.com/kevinanthony/collection-keep-updater/utils"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var (
-	try   bool
-	write bool
+const (
+	testF  = "test-config"
+	writeF = "write-config"
 )
 
 var addCmd = &cobra.Command{
@@ -20,8 +21,8 @@ var addCmd = &cobra.Command{
 }
 
 func init() {
-	addCmd.PersistentFlags().BoolVarP(&try, "test-config", "t", false, "test the configuration by calling source and outputting result.")
-	addCmd.PersistentFlags().BoolVarP(&write, "write-config", "w", false, "save the configuration.")
+	addCmd.PersistentFlags().BoolP(testF, "t", false, "test the configuration by calling source and outputting result.")
+	addCmd.PersistentFlags().BoolP(writeF, "w", false, "save the configuration.")
 
 	addCmd.MarkFlagsOneRequired("test-config", "write-config")
 	addCmd.MarkFlagsMutuallyExclusive("test-config", "write-config")
@@ -31,13 +32,13 @@ func init() {
 
 func runAdd(cmd types.ICommand, args []string) error {
 	switch {
-	case isSeries:
+	case utils.GetFlagBool(cmd, seriesFlag):
 		s, err := newSeriesConfig(cmd)
 		if err != nil {
 			return err
 		}
 
-		if try {
+		if utils.GetFlagBool(cmd, testF) {
 			source, err := ctxu.GetSource(cmd, s.Source)
 			if err != nil {
 				return err
@@ -51,7 +52,7 @@ func runAdd(cmd types.ICommand, args []string) error {
 			books.Print(cmd)
 		}
 
-		if write {
+		if utils.GetFlagBool(cmd, writeF) {
 			cfg, err := ctxu.GetConfig(cmd)
 			if err != nil {
 				return err

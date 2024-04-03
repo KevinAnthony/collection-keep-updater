@@ -15,9 +15,8 @@ type ICommand interface {
 	Context() context.Context
 	SetContext(ctx context.Context)
 	OutOrStdout() io.Writer
-	Flag(name string) (flag *pflag.Flag)
+	Flag(name string) *pflag.Flag
 	PersistentFlags() *pflag.FlagSet
-	Flags() *pflag.FlagSet
 }
 
 func CmdRunE(f func(cmd ICommand, args []string) error) func(cmd *cobra.Command, args []string) error {

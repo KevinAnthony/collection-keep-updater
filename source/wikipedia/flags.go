@@ -16,18 +16,11 @@ const (
 	tableF  = "wiki-table-numbers"
 )
 
-var (
-	volumeV string
-	titleV  string
-	isbnV   string
-	tableV  []int
-)
-
 type settingsHelper struct{}
 
 func (s settingsHelper) GetIDFromURL(url string) (string, error) {
 	if len(url) == 0 {
-		return "", errors.New("unknown/unset url.  url is required")
+		return "", errors.New("unknown/unset url. url is required")
 	}
 	if !strings.HasPrefix(url, "https://en.wikipedia.org/wiki/") {
 		return "", errors.New("url is malformed")
@@ -42,10 +35,10 @@ func (s settingsHelper) SourceSettingFromFlags(cmd types.ICommand, sourceSetting
 		settings = &wikiSettings{}
 	}
 
-	settings.VolumeHeader = utils.GetFlagOrDefault[*string](cmd, volumeF, &volumeV, settings.VolumeHeader)
-	settings.TitleHeader = utils.GetFlagOrDefault[*string](cmd, titleF, &titleV, settings.TitleHeader)
-	settings.ISBNHeader = utils.GetFlagOrDefault[*string](cmd, isbnF, &isbnV, settings.ISBNHeader)
-	settings.Table = utils.GetFlagOrDefault[[]int](cmd, tableF, tableV, settings.Table)
+	settings.VolumeHeader = utils.GetFlagStringPtr(cmd, volumeF)
+	settings.TitleHeader = utils.GetFlagStringPtr(cmd, titleF)
+	settings.ISBNHeader = utils.GetFlagStringPtr(cmd, isbnF)
+	settings.Table = utils.GetFlagIntSlice(cmd, tableF)
 
 	return settings, nil
 }
@@ -70,8 +63,8 @@ func (s settingsHelper) SourceSettingFromConfig(data map[string]interface{}) typ
 }
 
 func SetFlags(cmd types.ICommand) {
-	cmd.PersistentFlags().StringVar(&volumeV, volumeF, "", "header of the column that has the volume number.")
-	cmd.PersistentFlags().StringVar(&titleV, titleF, "", "header of the column that has the title.")
-	cmd.PersistentFlags().StringVar(&isbnV, isbnF, "", "header of the column that has the ISBN number(required).")
-	cmd.PersistentFlags().IntSliceVar(&tableV, tableF, []int{}, "tables to include, zero indexed. skip for all tables.")
+	cmd.PersistentFlags().String(volumeF, "", "header of the column that has the volume number.")
+	cmd.PersistentFlags().String(titleF, "", "header of the column that has the title.")
+	cmd.PersistentFlags().String(isbnF, "", "header of the column that has the ISBN number(required).")
+	cmd.PersistentFlags().IntSlice(tableF, []int{}, "tables to include, zero indexed. skip for all tables.")
 }

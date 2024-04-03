@@ -15,14 +15,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	seriesNameV      string
-	seriesKeyV       string
-	seriesURLV       string
-	seriesSourceV    string
-	seriesBlacklistV []string
-)
-
 const (
 	seriesNameF      = "name"
 	seriesKeyF       = "key"
@@ -32,11 +24,11 @@ const (
 )
 
 func seriesSetFlags(cmd types.ICommand) {
-	cmd.Flags().StringVar(&seriesNameV, seriesNameF, "", "name of the series.")
-	cmd.Flags().StringVar(&seriesKeyV, seriesKeyF, "", "unique key of the series.")
-	cmd.Flags().StringVar(&seriesURLV, seriesURLF, "", "url to be parsed for the series, extracting the ID.")
-	cmd.Flags().StringVar(&seriesSourceV, seriesSourceF, "", "type of source to be added. [viz, wikipieda]")
-	cmd.Flags().StringArrayVar(&seriesBlacklistV, seriesBlacklistF, []string{}, "list of ISBNs to be ignored.")
+	cmd.PersistentFlags().String(seriesNameF, "", "name of the series.")
+	cmd.PersistentFlags().String(seriesKeyF, "", "unique key of the series.")
+	cmd.PersistentFlags().String(seriesURLF, "", "url to be parsed for the series, extracting the ID.")
+	cmd.PersistentFlags().String(seriesSourceF, "", "type of source to be added. [viz, wikipieda]")
+	cmd.PersistentFlags().StringArray(seriesBlacklistF, []string{}, "list of ISBNs to be ignored.")
 
 	viz.SetFlags(cmd)
 	wikipedia.SetFlags(cmd)
@@ -48,7 +40,7 @@ func newSeriesConfig(cmd types.ICommand) (types.Series, error) {
 }
 
 func editSeries(cmd types.ICommand, cfg types.Config) (*types.Series, error) {
-	key := utils.GetFlagOrDefault[string](cmd, seriesKeyF, seriesKeyV, "")
+	key := utils.GetFlagString(cmd, seriesKeyF)
 	if len(key) == 0 {
 		return nil, errors.New("key flag is required for edit")
 	}
@@ -75,12 +67,12 @@ func editSeries(cmd types.ICommand, cfg types.Config) (*types.Series, error) {
 }
 
 func seriesConfigFromFlags(cmd types.ICommand, series types.Series) (types.Series, error) {
-	series.Name = utils.GetFlagOrDefault[string](cmd, seriesNameF, seriesNameV, series.Name)
-	series.Key = utils.GetFlagOrDefault[string](cmd, seriesKeyF, seriesKeyV, series.Key)
-	series.Source = types.SourceType(utils.GetFlagOrDefault[string](cmd, seriesSourceF, seriesSourceV, string(series.Source)))
-	series.ISBNBlacklist = utils.GetFlagOrDefault[[]string](cmd, seriesBlacklistF, seriesBlacklistV, series.ISBNBlacklist)
+	series.Name = utils.GetFlagString(cmd, seriesNameF)
+	series.Key = utils.GetFlagString(cmd, seriesKeyF)
+	series.Source = types.SourceType(utils.GetFlagString(cmd, seriesSourceF))
+	series.ISBNBlacklist = utils.GetFlagStringSlice(cmd, seriesBlacklistF)
 
-	url := utils.GetFlagOrDefault[string](cmd, seriesURLF, seriesURLV, "")
+	url := utils.GetFlagString(cmd, seriesURLF)
 
 	sourceSetting, err := ctxu.GetSourceSetting(cmd, series.Source)
 	if err != nil {

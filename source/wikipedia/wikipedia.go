@@ -12,7 +12,10 @@ import (
 	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/atye/wikitable2json/pkg/client"
+	"github.com/pkg/errors"
 )
+
+//go:generate mockery --srcpkg=github.com/atye/wikitable2json/pkg/client --name=TableGetter --structname=TableGetterMock --filename=table_getter_mock.go --output . --outpkg=wikipedia
 
 const (
 	sourceName = "Wikipedia"
@@ -20,28 +23,32 @@ const (
 
 type wikiSource struct {
 	settingsHelper
-	client http.Client
+	client      http.Client
+	tableGetter client.TableGetter
 }
 
-func New(client http.Client) types.ISource {
+func New(client http.Client, getter client.TableGetter) (types.ISource, error) {
 	if client == nil {
-		panic("http client is nil")
+		return nil, errors.New("http client is nil")
+	}
+	if getter == nil {
+		return nil, errors.New("wikipedia table getter is nil")
 	}
 
 	return wikiSource{
 		settingsHelper: settingsHelper{},
 		client:         client,
-	}
+		tableGetter:    getter,
+	}, nil
 }
 
 func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
-	tg := client.NewTableGetter("keep-updater")
 	settings, err := types.GetSetting[wikiSettings](series)
 	if err != nil {
 		return nil, err
 	}
 
-	tables, err := tg.GetTablesKeyValue(ctx, series.ID, "en", false, 1, settings.Table...)
+	tables, err := l.tableGetter.GetTablesKeyValue(ctx, series.ID, "en", false, 1, settings.Table...)
 	if err != nil {
 		return nil, err
 	}
@@ -142,10 +149,6 @@ func (l wikiSource) getISBN13(row map[string]string, tableSetting wikiSettings) 
 }
 
 func (l wikiSource) regexISBN(str string, re *regexp.Regexp, count int) string {
-	if re == nil {
-		return utils.ISBNNormalize(str)
-	}
-
 	for _, match := range re.FindAllString(str, -1) {
 		isbn := utils.ISBNNormalize(match)
 		if len(isbn) == count {

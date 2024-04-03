@@ -25,7 +25,7 @@ func (s settingsHelper) SourceSettingFromFlags(_ types.ICommand, sourceSetting t
 
 func (s settingsHelper) GetIDFromURL(url string) (string, error) {
 	if len(url) == 0 {
-		return "", errors.New("unknown/unset url.  url is required")
+		return "", errors.New("unknown/unset url. url is required")
 	}
 	if !strings.HasPrefix(url, "https://yenpress.com/series/") {
 		return "", errors.New("url is malformed")

@@ -15,16 +15,11 @@ const (
 	getDelayF   = "viz-get-delay"
 )
 
-var (
-	maxBacklogV int
-	getDelayV   string
-)
-
 type settingsHelper struct{}
 
 func SetFlags(cmd types.ICommand) {
-	cmd.PersistentFlags().IntVar(&maxBacklogV, maxBacklogF, 0, "how many volumes from the end to check.")
-	cmd.PersistentFlags().StringVar(&getDelayV, getDelayF, "", "how long a delay to wait between each request, in go time.Duration format.")
+	cmd.PersistentFlags().Int(maxBacklogF, 0, "how many volumes from the end to check.")
+	cmd.PersistentFlags().String(getDelayF, "", "how long a delay to wait between each request, in go time.Duration format.")
 }
 
 func (v settingsHelper) SourceSettingFromFlags(cmd types.ICommand, sourceSetting types.ISourceSettings) (types.ISourceSettings, error) {
@@ -33,15 +28,10 @@ func (v settingsHelper) SourceSettingFromFlags(cmd types.ICommand, sourceSetting
 		settings = &vizSettings{}
 	}
 
-	settings.MaximumBacklog = utils.GetFlagOrDefault[*int](cmd, maxBacklogF, &maxBacklogV, settings.MaximumBacklog)
+	settings.MaximumBacklog = utils.GetFlagIntPtr(cmd, maxBacklogF)
 
-	var str string
-	if settings.Delay != nil {
-		str = settings.Delay.String()
-	}
-
-	delayStr := utils.GetFlagOrDefault[*string](cmd, getDelayF, &getDelayV, &str)
-	if delayStr != nil {
+	delayStr := utils.GetFlagStringPtr(cmd, getDelayF)
+	if delayStr != nil && len(*delayStr) > 0 {
 		delay, err := time.ParseDuration(*delayStr)
 		if err != nil {
 			return settings, errors.Wrap(err, "viz: cannot parse delay "+*delayStr)

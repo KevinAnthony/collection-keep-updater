@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
+	"github.com/kevinanthony/collection-keep-updater/utils"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -15,8 +16,8 @@ var editCmd = &cobra.Command{
 }
 
 func init() {
-	editCmd.PersistentFlags().BoolVarP(&try, "test-config", "t", false, "test the configuration by calling source and outputting result.")
-	editCmd.PersistentFlags().BoolVarP(&write, "write-config", "w", false, "save the configuration.")
+	editCmd.PersistentFlags().BoolP(testF, "t", false, "test the configuration by calling source and outputting result.")
+	editCmd.PersistentFlags().BoolP(writeF, "w", false, "save the configuration.")
 
 	editCmd.MarkFlagsOneRequired("test-config", "write-config")
 	editCmd.MarkFlagsMutuallyExclusive("test-config", "write-config")
@@ -31,13 +32,13 @@ func runEdit(cmd types.ICommand, args []string) error {
 	}
 
 	switch {
-	case isSeries:
+	case utils.GetFlagBool(cmd, seriesFlag):
 		s, err := editSeries(cmd, cfg)
 		if err != nil {
 			return err
 		}
 
-		if try {
+		if utils.GetFlagBool(cmd, testF) {
 			source, err := ctxu.GetSource(cmd, s.Source)
 			if err != nil {
 				return err
@@ -51,7 +52,7 @@ func runEdit(cmd types.ICommand, args []string) error {
 			books.Print(cmd)
 		}
 
-		if write {
+		if utils.GetFlagBool(cmd, writeF) {
 			cfg, err := ctxu.GetConfig(cmd)
 			if err != nil {
 				return err
