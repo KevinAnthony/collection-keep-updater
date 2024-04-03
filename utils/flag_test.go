@@ -5,6 +5,7 @@ import (
 
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
+
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/spf13/pflag"
 )
