@@ -9,7 +9,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var removeCmd = &cobra.Command{
@@ -37,36 +36,46 @@ func runRemove(cmd types.ICommand, args []string) error {
 
 	switch {
 	case utils.GetFlagBool(cmd, seriesFlag):
-		return removeSeries(cfg, settingsKey)
+		return removeSeries(cmd, cfg, settingsKey)
 	case utils.GetFlagBool(cmd, libraryFlag):
-		return removeLibrary(cfg, settingsKey)
+		return removeLibrary(cmd, cfg, settingsKey)
 	default:
 		return errors.New("unknown configuration type")
 	}
 }
 
-func removeSeries(cfg types.Config, key string) error {
+func removeSeries(cmd types.ICommand, cfg types.Config, key string) error {
 	for i, s := range cfg.Series {
 		if s.Key == key {
 			cfg.Series = append(cfg.Series[:i], cfg.Series[i+1:]...)
 
-			viper.Set("series", cfg.Series)
+			icfg, err := ctxu.GetConfigReader(cmd)
+			if err != nil {
+				return err
+			}
 
-			return viper.WriteConfig()
+			icfg.Set("series", cfg.Series)
+
+			return icfg.WriteConfig()
 		}
 	}
 
 	return fmt.Errorf("remove: unknown series: %s", key)
 }
 
-func removeLibrary(cfg types.Config, key string) error {
+func removeLibrary(cmd types.ICommand, cfg types.Config, key string) error {
 	for i, l := range cfg.Libraries {
 		if string(l.Name) == key {
 			cfg.Libraries = append(cfg.Libraries[:i], cfg.Libraries[i+1:]...)
 
-			viper.Set("libraries", cfg.Libraries)
+			icfg, err := ctxu.GetConfigReader(cmd)
+			if err != nil {
+				return err
+			}
 
-			return viper.WriteConfig()
+			icfg.Set("libraries", cfg.Libraries)
+
+			return icfg.WriteConfig()
 		}
 	}
 

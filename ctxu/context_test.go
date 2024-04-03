@@ -19,14 +19,17 @@ func TestSetConfig(t *testing.T) {
 	Convey("SetConfig", t, func() {
 		cfg := types.Config{}
 		ctx := context.Background()
-		expectedCtx := context.WithValue(ctx, ctxu.ContextKey("config_ctx_key"), cfg)
 		cmdMock := types.NewICommandMock(t)
+		cfgMock := types.NewIConfigMock(t)
+
+		midCtx := context.WithValue(ctx, ctxu.ContextKey("config_ctx_key"), cfg)
+		expectedCtx2 := context.WithValue(midCtx, ctxu.ContextKey("i_config_ctx_key"), cfgMock)
 
 		Convey("should set the cfg into the context of the command", func() {
 			cmdMock.On("Context").Once().Return(ctx)
-			cmdMock.On("SetContext", expectedCtx).Once()
+			cmdMock.On("SetContext", expectedCtx2).Once()
 
-			ctxu.SetConfig(cmdMock, cfg)
+			ctxu.SetConfig(cmdMock, cfgMock, cfg)
 		})
 	})
 }

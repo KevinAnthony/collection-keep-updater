@@ -32,6 +32,20 @@ func (_m *ICommandMock) Context() context.Context {
 	return r0
 }
 
+// Execute provides a mock function with given fields:
+func (_m *ICommandMock) Execute() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Flag provides a mock function with given fields: name
 func (_m *ICommandMock) Flag(name string) *pflag.Flag {
 	ret := _m.Called(name)
