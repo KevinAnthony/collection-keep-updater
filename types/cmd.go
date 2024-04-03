@@ -4,14 +4,15 @@ import (
 	"context"
 	"io"
 
-	"github.com/spf13/viper"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
-var _ ICommand = (*cobra.Command)(nil)
-var _ IConfig = (*viper.Viper)(nil)
+var (
+	_ ICommand = (*cobra.Command)(nil)
+	_ IConfig  = (*viper.Viper)(nil)
+)
 
 //go:generate mockery --name=ICommand --structname=ICommandMock --filename=cmd_mock.go --inpackage
 type ICommand interface {

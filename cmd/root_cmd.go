@@ -17,24 +17,22 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	rootCmd = &cobra.Command{
-		Use:   "noside",
-		Short: "Keep your book wanted library up to date",
-		Long: `Keep your book collection wanted section up to date.  
+var rootCmd = &cobra.Command{
+	Use:   "noside",
+	Short: "Keep your book wanted library up to date",
+	Long: `Keep your book collection wanted section up to date.  
 Configure it with different sources and it will compare what you already have listed with what is available and generate a wanted list.`,
-		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-			viperConfig := viper.New()
-			httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
-			wikiGetter := client.NewTableGetter("noside")
+	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+		viperConfig := viper.New()
+		httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
+		wikiGetter := client.NewTableGetter("noside")
 
-			if err := LoadDI(cmd, httpClient, wikiGetter); err != nil {
-				return err
-			}
-			return LoadConfig(cmd, viperConfig)
-		},
-	}
-)
+		if err := LoadDI(cmd, httpClient, wikiGetter); err != nil {
+			return err
+		}
+		return LoadConfig(cmd, viperConfig)
+	},
+}
 
 func init() {
 	rootCmd.AddCommand(config.GetCmd())
