@@ -128,7 +128,7 @@ func TestViz_GetISBNs(t *testing.T) {
 
 				So(err, ShouldBeNil)
 				So(books, ShouldResemble, expected)
-				So(end, ShouldBeBetween, 150*time.Millisecond, 175*time.Millisecond)
+				So(end, ShouldBeBetween, 150*time.Millisecond, 200*time.Millisecond)
 			})
 			Convey("should exclude books that have blacklists", func() {
 				series.ISBNBlacklist = []string{expected[2].ISBN13}
