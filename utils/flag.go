@@ -15,7 +15,11 @@ func GetFlagString(cmd types.ICommand, key string) string {
 }
 
 func GetFlagStringPtr(cmd types.ICommand, key string) *string {
-	str := GetFlagString(cmd, key)
+	str, err := cmd.PersistentFlags().GetString(key)
+	if err != nil {
+		// TODO log to console
+		return nil
+	}
 
 	return &str
 }
