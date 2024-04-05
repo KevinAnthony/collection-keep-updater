@@ -59,8 +59,13 @@ func SetDI(cmd types.ICommand, httpClient http.Client, sources map[types.SourceT
 	cmd.SetContext(ctx)
 }
 
-func SetLibraries(cmd types.ICommand, cfg types.Config) error {
+func SetLibraries(cmd types.ICommand) error {
 	ctx := cmd.Context()
+
+	cfg, err := GetConfig(cmd)
+	if err != nil {
+		return err
+	}
 
 	httpClient, ok := ctx.Value(httpKey).(http.Client)
 	if !ok {

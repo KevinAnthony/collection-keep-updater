@@ -33,7 +33,7 @@ type IConfig interface {
 	ReadInConfig() error
 	WriteConfig() error
 	Set(key string, value any)
-	Unmarshal(rawVal any, opts ...viper.DecoderConfigOption) error
+	Get(key string) any
 }
 
 func CmdRunE(f func(cmd ICommand, args []string) error) func(cmd *cobra.Command, args []string) error {

@@ -27,10 +27,11 @@ Configure it with different sources and it will compare what you already have li
 		httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
 		wikiGetter := client.NewTableGetter("noside")
 
-		if err := LoadDI(cmd, httpClient, wikiGetter); err != nil {
+		if err := LoadConfig(cmd, viperConfig); err != nil {
 			return err
 		}
-		return LoadConfig(cmd, viperConfig)
+
+		return LoadDI(cmd, httpClient, wikiGetter)
 	},
 }
 
@@ -68,7 +69,7 @@ func LoadDI(cmd types.ICommand, httpClient http.Client, wikiGetter client.TableG
 
 	ctxu.SetDI(cmd, httpClient, sources)
 
-	return nil
+	return ctxu.SetLibraries(cmd)
 }
 
 func LoadConfig(
@@ -87,18 +88,31 @@ func LoadConfig(
 
 	var cfg types.Config
 
-	if err := icfg.Unmarshal(&cfg, config.SeriesConfigHookFunc(cmd)); err != nil {
-		return err
+	seriesSlice := icfg.Get("series").([]interface{})
+	for _, data := range seriesSlice {
+		series, err := config.GetSeries(cmd, data)
+		if err != nil {
+			return err
+		}
+
+		cfg.Series = append(cfg.Series, series)
+	}
+
+	libSlice := icfg.Get("libraries").([]interface{})
+	for _, data := range libSlice {
+		library, err := config.GetLibrary(cmd, data)
+		if err != nil {
+			return err
+		}
+
+		cfg.Libraries = append(cfg.Libraries, library)
 	}
 
 	ctxu.SetConfig(cmd, icfg, cfg)
-	if err := ctxu.SetLibraries(cmd, cfg); err != nil {
-		return err
-	}
 
 	return nil
 }
 
-func GetCmd() types.ICommand {
+func GetRootCmd() types.ICommand {
 	return rootCmd
 }
