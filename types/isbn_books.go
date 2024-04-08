@@ -63,7 +63,7 @@ func (b ISBNBooks) RemoveAt(i int) ISBNBooks {
 	return append(b[:i], b[i+1:]...)
 }
 
-func (b ISBNBooks) Print(cmd ICommand) error {
+func (b ISBNBooks) Print(cmd ICommand) {
 	t := out.NewTable(cmd.OutOrStdout())
 	t.AppendHeader(table.Row{"Title", "Volume", "ISBN 10", "ISBN 13", "Source"})
 	for _, book := range b {
@@ -71,6 +71,4 @@ func (b ISBNBooks) Print(cmd ICommand) error {
 	}
 
 	t.Render()
-
-	return nil
 }

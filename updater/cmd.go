@@ -63,9 +63,7 @@ func Run(cmd types.ICommand, updateSvc IUpdater) error {
 
 			continue
 		case utils.GetFlagBool(cmd, printF):
-			if err := wanted.Print(cmd); err != nil {
-				return err
-			}
+			wanted.Print(cmd)
 		case utils.GetFlagBool(cmd, writeF):
 			if err := library.SaveWanted(wanted); err != nil {
 				return err

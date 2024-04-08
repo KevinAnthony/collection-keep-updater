@@ -11,7 +11,7 @@ type (
 
 //go:generate mockery --name=ILibrary --structname=ILibraryMock --filename=library_mock.go --inpackage
 type ILibrary interface {
-	GetBooksInCollection() (ISBNBooks, error)
+	GetBooksInCollection(ctx context.Context) (ISBNBooks, error)
 	SaveWanted(wanted ISBNBooks) error
 }
 
