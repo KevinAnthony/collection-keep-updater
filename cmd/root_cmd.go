@@ -31,7 +31,11 @@ Configure it with different sources and it will compare what you already have li
 			return err
 		}
 
-		return LoadDI(cmd, httpClient, wikiGetter)
+		if err := LoadSources(cmd, httpClient, wikiGetter); err != nil {
+			return err
+		}
+
+		return ctxu.SetLibraries(cmd)
 	},
 }
 
@@ -40,36 +44,37 @@ func init() {
 	rootCmd.AddCommand(updater.GetCmd())
 }
 
-func LoadDI(cmd types.ICommand, httpClient http.Client, wikiGetter client.TableGetter) error {
-	sources := map[types.SourceType]types.ISource{}
-
-	if wiki, err := wikipedia.New(httpClient, wikiGetter); err != nil {
+func LoadSources(cmd types.ICommand, httpClient http.Client, wikiGetter client.TableGetter) error {
+	vizSource, err := viz.New(httpClient)
+	if err != nil {
 		return err
-	} else {
-		sources[types.WikipediaSource] = wiki
 	}
 
-	if vizSource, err := viz.New(httpClient); err != nil {
+	wikiSource, err := wikipedia.New(httpClient, wikiGetter)
+	if err != nil {
 		return err
-	} else {
-		sources[types.VizSource] = vizSource
 	}
 
-	if yenSource, err := yen.New(httpClient); err != nil {
+	yenSource, err := yen.New(httpClient)
+	if err != nil {
 		return err
-	} else {
-		sources[types.YenSource] = yenSource
 	}
 
-	if kodanshaSource, err := kodansha.New(httpClient); err != nil {
+	kodanshaSource, err := kodansha.New(httpClient)
+	if err != nil {
 		return err
-	} else {
-		sources[types.Kodansha] = kodanshaSource
+	}
+
+	sources := map[types.SourceType]types.ISource{
+		types.WikipediaSource: wikiSource,
+		types.VizSource:       vizSource,
+		types.YenSource:       yenSource,
+		types.Kodansha:        kodanshaSource,
 	}
 
 	ctxu.SetDI(cmd, httpClient, sources)
 
-	return ctxu.SetLibraries(cmd)
+	return nil
 }
 
 func LoadConfig(

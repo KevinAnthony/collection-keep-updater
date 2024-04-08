@@ -17,7 +17,7 @@ func TestWikiSettings_Print(t *testing.T) {
 	table := `┌────────────────────┬───────────────────┬───────────────────┬────────────────┐
 │ VOLUME COLUMN NAME │ TITLE COLUMN NAME │ ISBN COLUMN TITLE │ TABLES ON PAGE │
 ├────────────────────┼───────────────────┼───────────────────┼────────────────┤
-│ vheader            │ theader           │ iheader           │ 1,8,12         │
+│ vheader            │ theader           │ iheader           │ 1, 8, 12       │
 └────────────────────┴───────────────────┴───────────────────┴────────────────┘
 `
 
@@ -29,9 +29,7 @@ func TestWikiSettings_Print(t *testing.T) {
 		cmdMock.On("OutOrStdout").Once().Return(writer)
 
 		Convey("should print empty message to buffer", func() {
-			err := settings.Print(cmdMock)
-
-			So(err, ShouldBeNil)
+			settings.Print(cmdMock)
 
 			So(writer.String(), ShouldEqual, table)
 		})

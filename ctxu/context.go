@@ -20,6 +20,7 @@ const (
 	iconfigKey   ContextKey = "i_config_ctx_key"
 	librariesKey ContextKey = "libraries_ctx_key"
 	sourcesKey   ContextKey = "sources_ctx_key"
+	updaterKey   ContextKey = "updater_ctx_key"
 	httpKey      ContextKey = "http_ctx_key"
 )
 

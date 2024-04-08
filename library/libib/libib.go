@@ -32,8 +32,7 @@ func New(cfg types.LibrarySettings, c http.Client) types.ILibrary {
 	}
 }
 
-func (l libIB) GetBooksInCollection() (types.ISBNBooks, error) {
-	ctx := context.Background()
+func (l libIB) GetBooksInCollection(ctx context.Context) (types.ISBNBooks, error) {
 	var libibEntries []libibCSVEntries
 
 	for _, library := range append(l.cfg.OtherColIDs, l.cfg.WantedColID) {

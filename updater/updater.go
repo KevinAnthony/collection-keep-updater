@@ -11,7 +11,7 @@ import (
 
 //go:generate mockery --name=IUpdater --structname=IUpdaterMock --filename=updater_mock.go --inpackage
 type IUpdater interface {
-	GetAllAvailableBooks(ctx types.ICommand, series []types.Series) (types.ISBNBooks, error)
+	GetAllAvailableBooks(cmd types.ICommand, series []types.Series) (types.ISBNBooks, error)
 	UpdateLibrary(ctx context.Context, library types.ILibrary, availableBooks types.ISBNBooks) (types.ISBNBooks, error)
 }
 
@@ -21,8 +21,8 @@ func NewUpdater() IUpdater {
 	return updater{}
 }
 
-func (u updater) UpdateLibrary(_ context.Context, library types.ILibrary, availableBooks types.ISBNBooks) (types.ISBNBooks, error) {
-	booksInLibrary, err := library.GetBooksInCollection()
+func (u updater) UpdateLibrary(ctx context.Context, library types.ILibrary, availableBooks types.ISBNBooks) (types.ISBNBooks, error) {
+	booksInLibrary, err := library.GetBooksInCollection(ctx)
 	if err != nil {
 		return nil, err
 	}

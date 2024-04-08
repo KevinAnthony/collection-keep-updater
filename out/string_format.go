@@ -18,13 +18,13 @@ func IntSliceToStrOrEmpty(i []int) string {
 		return ""
 	}
 
-	return strings.Trim(strings.Replace(fmt.Sprint(i), " ", ",", -1), "[]")
+	return strings.Trim(strings.Replace(fmt.Sprint(i), " ", ", ", -1), "[]")
 }
 
-func Partial(s string, i int) string {
-	if len(s) < i {
-		return "..."
+func Partial(s string, n int) string {
+	if len(s) < n {
+		return s
 	}
 
-	return s[0:i] + "..."
+	return s[0:n] + "..."
 }
