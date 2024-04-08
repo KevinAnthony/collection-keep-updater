@@ -6,11 +6,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
-
 	"github.com/kevinanthony/collection-keep-updater/cmd"
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
+	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
