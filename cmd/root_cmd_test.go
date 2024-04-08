@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
+
 	"github.com/kevinanthony/collection-keep-updater/cmd"
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
@@ -145,7 +147,37 @@ func TestLoadConfig(t *testing.T) {
 
 func TestLoadDI(t *testing.T) {
 	t.Parallel()
-	Convey("LoadDI", t, func() {})
+	Convey("LoadSources", t, func() {
+		ctx := ctxu.NewContextMock(t)
+		cmdMock := types.NewICommandMock(t)
+		clientMock := http.NewClientMock(t)
+		wikiMock := wikipedia.NewTableGetterMock(t)
+
+		getCall := cmdMock.On("Context").Maybe()
+		setCall := cmdMock.On("SetContext", mock.Anything).Maybe()
+
+		Convey("should set source in context", func() {
+			getCall.Once().Return(ctx)
+			setCall.Once().Return()
+
+			err := cmd.LoadSources(cmdMock, clientMock, wikiMock)
+
+			So(err, ShouldBeNil)
+		})
+
+		Convey("should return error when", func() {
+			Convey("client mock is nil", func() {
+				err := cmd.LoadSources(cmdMock, nil, wikiMock)
+
+				So(err, ShouldBeError, "http client is nil")
+			})
+			Convey("wiki mock is nil", func() {
+				err := cmd.LoadSources(cmdMock, clientMock, nil)
+
+				So(err, ShouldBeError, "wikipedia table getter is nil")
+			})
+		})
+	})
 }
 
 func matchFunc(expectedIConfig types.IConfig, expectedConfig types.Config) func(ctx context.Context) bool {
