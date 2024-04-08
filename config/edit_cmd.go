@@ -6,7 +6,6 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/utils"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var editCmd = &cobra.Command{
@@ -59,9 +58,14 @@ func runEdit(cmd types.ICommand, args []string) error {
 			}
 
 			cfg.Series = append(cfg.Series, *s)
-			viper.Set("series", cfg.Series)
+			icfg, err := ctxu.GetConfigReader(cmd)
+			if err != nil {
+				return err
+			}
 
-			return viper.WriteConfig()
+			icfg.Set("series", cfg.Series)
+
+			return icfg.WriteConfig()
 		}
 	}
 

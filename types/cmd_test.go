@@ -31,27 +31,6 @@ func TestCmdArgs(t *testing.T) {
 	})
 }
 
-func TestCmdPersistentPreRunE(t *testing.T) {
-	t.Parallel()
-
-	Convey("CmdPersistentPreRunE", t, func() {
-		cmd := &cobra.Command{}
-
-		Convey("should call f with cmd, and return error if func returns error", func() {
-			f := func(iCommand types.ICommand, args []string) error {
-				So(cmd, ShouldEqual, iCommand)
-
-				return errors.New("this was called")
-			}
-			fn := types.CmdPersistentPreRunE(f)
-
-			err := fn(cmd, nil)
-
-			So(err, ShouldBeError, "this was called")
-		})
-	})
-}
-
 func TestCmdRunE(t *testing.T) {
 	Convey("CmdRunE", t, func() {
 		cmd := &cobra.Command{}

@@ -113,25 +113,42 @@ func SeriesConfigHookFunc(cmd types.ICommand) viper.DecoderConfigOption {
 			return data, nil
 		}
 
-		values, ok := data.(map[string]interface{})
-		if !ok {
-			return data, nil
-		}
-
-		sourceValue := utils.Get[map[string]interface{}](values, "source_settings")
-		series := types.Series{
-			Name:          utils.Get[string](values, "name"),
-			ID:            utils.Get[string](values, "id"),
-			Key:           utils.Get[string](values, "key"),
-			Source:        types.SourceType(utils.Get[string](values, "source")),
-			ISBNBlacklist: utils.GetArray[string](values, "isbn_blacklist"),
-		}
-
-		series.SourceSettings = getSetting(cmd, series.Source, sourceValue)
-
-		return series, nil
+		return GetSeries(cmd, data)
 	},
 	)
+}
+
+func GetSeries(cmd types.ICommand, data interface{}) (types.Series, error) {
+	values, ok := data.(map[string]interface{})
+	if !ok {
+		return types.Series{}, errors.New("data is not a series")
+	}
+
+	sourceValue := utils.Get[map[string]interface{}](values, "source_settings")
+	series := types.Series{
+		Name:          utils.Get[string](values, "name"),
+		ID:            utils.Get[string](values, "id"),
+		Key:           utils.Get[string](values, "key"),
+		Source:        types.SourceType(utils.Get[string](values, "source")),
+		ISBNBlacklist: utils.GetArray[string](values, "isbn_blacklist"),
+	}
+
+	series.SourceSettings = getSetting(cmd, series.Source, sourceValue)
+
+	return series, nil
+}
+
+func GetLibrary(cmd types.ICommand, data interface{}) (types.LibrarySettings, error) {
+	values, ok := data.(map[string]interface{})
+	if !ok {
+		return types.LibrarySettings{}, errors.New("data is not a library")
+	}
+	return types.LibrarySettings{
+		Name:        types.LibraryType(utils.Get[string](values, "type")),
+		WantedColID: utils.Get[string](values, "wanted_collection_id"),
+		OtherColIDs: utils.GetArray[string](values, "other_collection_ids"),
+		APIKey:      utils.Get[string](values, "api_key"),
+	}, nil
 }
 
 func getSetting(cmd types.ICommand, key types.SourceType, data map[string]interface{}) types.ISourceSettings {

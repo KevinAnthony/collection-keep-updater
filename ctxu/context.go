@@ -17,15 +17,17 @@ type ContextKey string
 
 const (
 	configKey    ContextKey = "config_ctx_key"
+	iconfigKey   ContextKey = "i_config_ctx_key"
 	librariesKey ContextKey = "libraries_ctx_key"
 	sourcesKey   ContextKey = "sources_ctx_key"
 	httpKey      ContextKey = "http_ctx_key"
 )
 
-func SetConfig(cmd types.ICommand, cfg types.Config) {
+func SetConfig(cmd types.ICommand, v types.IConfig, cfg types.Config) {
 	ctx := cmd.Context()
 
 	ctx = context.WithValue(ctx, configKey, cfg)
+	ctx = context.WithValue(ctx, iconfigKey, v)
 
 	cmd.SetContext(ctx)
 }
@@ -39,6 +41,15 @@ func GetConfig(cmd types.ICommand) (types.Config, error) {
 	return types.Config{}, errors.New("configuration not found in context")
 }
 
+func GetConfigReader(cmd types.ICommand) (types.IConfig, error) {
+	value := cmd.Context().Value(iconfigKey)
+	if cfg, ok := value.(types.IConfig); ok {
+		return cfg, nil
+	}
+
+	return nil, errors.New("configuration reader not found in context")
+}
+
 func SetDI(cmd types.ICommand, httpClient http.Client, sources map[types.SourceType]types.ISource) {
 	ctx := cmd.Context()
 
@@ -48,8 +59,13 @@ func SetDI(cmd types.ICommand, httpClient http.Client, sources map[types.SourceT
 	cmd.SetContext(ctx)
 }
 
-func SetLibraries(cmd types.ICommand, cfg types.Config) error {
+func SetLibraries(cmd types.ICommand) error {
 	ctx := cmd.Context()
+
+	cfg, err := GetConfig(cmd)
+	if err != nil {
+		return err
+	}
 
 	httpClient, ok := ctx.Value(httpKey).(http.Client)
 	if !ok {

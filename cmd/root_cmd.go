@@ -17,43 +17,30 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	// Used for flags.
-	cfgFile string
-
-	rootCmd = &cobra.Command{
-		Use:   "noside",
-		Short: "Keep your book wanted library up to date",
-		Long: `Keep your book collection wanted section up to date.  
+var rootCmd = &cobra.Command{
+	Use:   "noside",
+	Short: "Keep your book wanted library up to date",
+	Long: `Keep your book collection wanted section up to date.  
 Configure it with different sources and it will compare what you already have listed with what is available and generate a wanted list.`,
-		PersistentPreRunE: types.CmdPersistentPreRunE(LoadConfig),
-	}
-)
+	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+		viperConfig := viper.New()
+		httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
+		wikiGetter := client.NewTableGetter("noside")
+
+		if err := LoadConfig(cmd, viperConfig); err != nil {
+			return err
+		}
+
+		return LoadDI(cmd, httpClient, wikiGetter)
+	},
+}
 
 func init() {
 	rootCmd.AddCommand(config.GetCmd())
 	rootCmd.AddCommand(updater.GetCmd())
 }
 
-func LoadConfig(cmd types.ICommand, _ []string) error {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		viper.AddConfigPath("$HOME/.config/noside/")
-		viper.AddConfigPath(".")
-		viper.SetConfigType("yaml")
-		viper.SetConfigName("config")
-	}
-
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		return err
-	}
-
-	httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
-	wikiGetter := client.NewTableGetter("keep-updater")
+func LoadDI(cmd types.ICommand, httpClient http.Client, wikiGetter client.TableGetter) error {
 	sources := map[types.SourceType]types.ISource{}
 
 	if wiki, err := wikipedia.New(httpClient, wikiGetter); err != nil {
@@ -62,39 +49,70 @@ func LoadConfig(cmd types.ICommand, _ []string) error {
 		sources[types.WikipediaSource] = wiki
 	}
 
-	if viz, err := viz.New(httpClient); err != nil {
+	if vizSource, err := viz.New(httpClient); err != nil {
 		return err
 	} else {
-		sources[types.VizSource] = viz
+		sources[types.VizSource] = vizSource
 	}
 
-	if yen, err := yen.New(httpClient); err != nil {
+	if yenSource, err := yen.New(httpClient); err != nil {
 		return err
 	} else {
-		sources[types.YenSource] = yen
+		sources[types.YenSource] = yenSource
 	}
 
-	if kodansha, err := kodansha.New(httpClient); err != nil {
+	if kodanshaSource, err := kodansha.New(httpClient); err != nil {
 		return err
 	} else {
-		sources[types.Kodansha] = kodansha
+		sources[types.Kodansha] = kodanshaSource
 	}
 
 	ctxu.SetDI(cmd, httpClient, sources)
+
+	return ctxu.SetLibraries(cmd)
+}
+
+func LoadConfig(
+	cmd types.ICommand,
+	icfg types.IConfig,
+) error {
+	icfg.AddConfigPath("$HOME/.config/noside/")
+	icfg.AddConfigPath(".")
+	icfg.SetConfigType("yaml")
+	icfg.SetConfigName("config")
+	icfg.AutomaticEnv()
+
+	if err := icfg.ReadInConfig(); err != nil {
+		return err
+	}
+
 	var cfg types.Config
 
-	if err := viper.Unmarshal(&cfg, config.SeriesConfigHookFunc(cmd)); err != nil {
-		return err
+	seriesSlice := icfg.Get("series").([]interface{})
+	for _, data := range seriesSlice {
+		series, err := config.GetSeries(cmd, data)
+		if err != nil {
+			return err
+		}
+
+		cfg.Series = append(cfg.Series, series)
 	}
 
-	ctxu.SetConfig(cmd, cfg)
-	if err := ctxu.SetLibraries(cmd, cfg); err != nil {
-		return err
+	libSlice := icfg.Get("libraries").([]interface{})
+	for _, data := range libSlice {
+		library, err := config.GetLibrary(cmd, data)
+		if err != nil {
+			return err
+		}
+
+		cfg.Libraries = append(cfg.Libraries, library)
 	}
+
+	ctxu.SetConfig(cmd, icfg, cfg)
 
 	return nil
 }
 
-func Execute() error {
-	return rootCmd.Execute()
+func GetRootCmd() types.ICommand {
+	return rootCmd
 }
