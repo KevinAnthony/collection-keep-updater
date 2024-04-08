@@ -18,7 +18,9 @@ const (
 var cmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update Libraries based on sources",
-	RunE:  types.CmdRunE(run),
+	RunE: func(cmd *cobra.Command, _ []string) error {
+		return Run(cmd, NewUpdater())
+	},
 }
 
 func init() {
@@ -33,7 +35,7 @@ func GetCmd() *cobra.Command {
 	return cmd
 }
 
-func run(cmd types.ICommand, _ []string) error {
+func Run(cmd types.ICommand, updateSvc IUpdater) error {
 	cfg, err := ctxu.GetConfig(cmd)
 	if err != nil {
 		return err
@@ -43,8 +45,6 @@ func run(cmd types.ICommand, _ []string) error {
 	if err != nil {
 		return err
 	}
-
-	updateSvc := NewUpdater()
 
 	availableBooks, err := updateSvc.GetAllAvailableBooks(cmd, cfg.Series)
 	if err != nil {
