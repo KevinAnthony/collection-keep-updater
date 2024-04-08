@@ -4,17 +4,13 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/pkg/errors"
-
-	"github.com/spf13/pflag"
-
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
-
 	"github.com/kevinanthony/collection-keep-updater/types"
-
 	"github.com/kevinanthony/collection-keep-updater/updater"
 
+	"github.com/pkg/errors"
 	. "github.com/smartystreets/goconvey/convey"
+	"github.com/spf13/pflag"
 )
 
 func TestGetCmd(t *testing.T) {
