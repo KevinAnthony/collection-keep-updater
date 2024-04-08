@@ -7,8 +7,8 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/library/libib"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
-
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 )
 
 //go:generate mockery --srcpkg=context --name=Context --structname=ContextMock --filename=context_mock.go --output . --outpkg=ctxu
@@ -16,19 +16,17 @@ import (
 type ContextKey string
 
 const (
-	configKey    ContextKey = "config_ctx_key"
-	iconfigKey   ContextKey = "i_config_ctx_key"
-	librariesKey ContextKey = "libraries_ctx_key"
-	sourcesKey   ContextKey = "sources_ctx_key"
-	updaterKey   ContextKey = "updater_ctx_key"
-	httpKey      ContextKey = "http_ctx_key"
+	configKey       ContextKey = "config_ctx_key"
+	configLoaderKey ContextKey = "config_loader_ctx_key"
+	librariesKey    ContextKey = "libraries_ctx_key"
+	sourcesKey      ContextKey = "sources_ctx_key"
+	httpKey         ContextKey = "http_ctx_key"
 )
 
-func SetConfig(cmd types.ICommand, v types.IConfig, cfg types.Config) {
+func SetConfig(cmd types.ICommand, cfg types.Config) {
 	ctx := cmd.Context()
 
 	ctx = context.WithValue(ctx, configKey, cfg)
-	ctx = context.WithValue(ctx, iconfigKey, v)
 
 	cmd.SetContext(ctx)
 }
@@ -42,13 +40,19 @@ func GetConfig(cmd types.ICommand) (types.Config, error) {
 	return types.Config{}, errors.New("configuration not found in context")
 }
 
-func GetConfigReader(cmd types.ICommand) (types.IConfig, error) {
-	value := cmd.Context().Value(iconfigKey)
+func GetConfigReader(cmd types.ICommand) types.IConfig {
+	ctx := cmd.Context()
+
+	value := ctx.Value(configLoaderKey)
 	if cfg, ok := value.(types.IConfig); ok {
-		return cfg, nil
+		return cfg
 	}
 
-	return nil, errors.New("configuration reader not found in context")
+	v := viper.New()
+	ctx = context.WithValue(ctx, configLoaderKey, v)
+	cmd.SetContext(ctx)
+
+	return v
 }
 
 func SetDI(cmd types.ICommand, httpClient http.Client, sources map[types.SourceType]types.ISource) {

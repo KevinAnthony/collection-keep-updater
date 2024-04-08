@@ -58,10 +58,7 @@ func runEdit(cmd types.ICommand, args []string) error {
 			}
 
 			cfg.Series = append(cfg.Series, *s)
-			icfg, err := ctxu.GetConfigReader(cmd)
-			if err != nil {
-				return err
-			}
+			icfg := ctxu.GetConfigReader(cmd)
 
 			icfg.Set("series", cfg.Series)
 

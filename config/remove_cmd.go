@@ -49,10 +49,7 @@ func removeSeries(cmd types.ICommand, cfg types.Config, key string) error {
 		if s.Key == key {
 			cfg.Series = append(cfg.Series[:i], cfg.Series[i+1:]...)
 
-			icfg, err := ctxu.GetConfigReader(cmd)
-			if err != nil {
-				return err
-			}
+			icfg := ctxu.GetConfigReader(cmd)
 
 			icfg.Set("series", cfg.Series)
 
@@ -68,10 +65,7 @@ func removeLibrary(cmd types.ICommand, cfg types.Config, key string) error {
 		if string(l.Name) == key {
 			cfg.Libraries = append(cfg.Libraries[:i], cfg.Libraries[i+1:]...)
 
-			icfg, err := ctxu.GetConfigReader(cmd)
-			if err != nil {
-				return err
-			}
+			icfg := ctxu.GetConfigReader(cmd)
 
 			icfg.Set("libraries", cfg.Libraries)
 

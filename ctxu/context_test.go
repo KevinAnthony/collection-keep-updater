@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/spf13/viper"
+
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/library/libib"
 	"github.com/kevinanthony/collection-keep-updater/types"
@@ -20,16 +22,14 @@ func TestSetConfig(t *testing.T) {
 		cfg := types.Config{}
 		ctx := context.Background()
 		cmdMock := types.NewICommandMock(t)
-		cfgMock := types.NewIConfigMock(t)
 
-		midCtx := context.WithValue(ctx, ctxu.ContextKey("config_ctx_key"), cfg)
-		expectedCtx2 := context.WithValue(midCtx, ctxu.ContextKey("i_config_ctx_key"), cfgMock)
+		valueCtx := context.WithValue(ctx, ctxu.ContextKey("config_ctx_key"), cfg)
 
 		Convey("should set the cfg into the context of the command", func() {
 			cmdMock.On("Context").Once().Return(ctx)
-			cmdMock.On("SetContext", expectedCtx2).Once()
+			cmdMock.On("SetContext", valueCtx).Once()
 
-			ctxu.SetConfig(cmdMock, cfgMock, cfg)
+			ctxu.SetConfig(cmdMock, cfg)
 		})
 	})
 }
@@ -72,24 +72,26 @@ func TestGetConfigReader(t *testing.T) {
 		cmdMock := types.NewICommandMock(t)
 		cfgMock := types.NewIConfigMock(t)
 
-		cmdCall := cmdMock.On("Context").Once()
-		ctxCall := ctx.On("Value", ctxu.ContextKey("i_config_ctx_key")).Maybe()
+		getCtxCall := cmdMock.On("Context").Once()
+
+		ctxCall := ctx.On("Value", ctxu.ContextKey("config_loader_ctx_key")).Maybe()
 
 		Convey("should get this cfg from the context of the command", func() {
-			cmdCall.Return(ctx)
+			getCtxCall.Return(ctx)
 			ctxCall.Once().Return(cfgMock)
 
-			actual, err := ctxu.GetConfigReader(cmdMock)
+			actual := ctxu.GetConfigReader(cmdMock)
 
 			So(actual, ShouldResemble, cfgMock)
-			So(err, ShouldBeNil)
 		})
-		Convey("should return error when cfg not in context", func() {
-			cmdCall.Return(context.Background())
+		Convey("should return new viper when read is not in config", func() {
+			cmdMock.On("SetContext", mock.Anything)
 
-			_, err := ctxu.GetConfigReader(cmdMock)
+			getCtxCall.Return(context.Background())
 
-			So(err, ShouldBeError, "configuration reader not found in context")
+			actual := ctxu.GetConfigReader(cmdMock)
+
+			So(actual, ShouldHaveSameTypeAs, viper.New())
 		})
 	})
 }
