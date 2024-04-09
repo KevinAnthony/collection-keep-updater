@@ -3,7 +3,6 @@ package di
 import (
 	"context"
 
-	"github.com/atye/wikitable2json/pkg/client"
 	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/source/kodansha"
@@ -12,6 +11,8 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
+
+	"github.com/atye/wikitable2json/pkg/client"
 )
 
 const (

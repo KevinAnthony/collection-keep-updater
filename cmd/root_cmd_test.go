@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/kevinanthony/collection-keep-updater/cmd"
+
 	. "github.com/smartystreets/goconvey/convey"
 )
 

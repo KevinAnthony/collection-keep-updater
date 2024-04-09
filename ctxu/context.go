@@ -7,8 +7,8 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/library/libib"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
+
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 )
 
 //go:generate mockery --srcpkg=context --name=Context --structname=ContextMock --filename=context_mock.go --output . --outpkg=ctxu
@@ -38,21 +38,6 @@ func GetConfig(cmd types.ICommand) (types.Config, error) {
 	}
 
 	return types.Config{}, errors.New("configuration not found in context")
-}
-
-func GetConfigReader(cmd types.ICommand) types.IConfig {
-	ctx := cmd.Context()
-
-	value := ctx.Value(configLoaderKey)
-	if cfg, ok := value.(types.IConfig); ok {
-		return cfg
-	}
-
-	v := viper.New()
-	ctx = context.WithValue(ctx, configLoaderKey, v)
-	cmd.SetContext(ctx)
-
-	return v
 }
 
 func SetDI(cmd types.ICommand, httpClient http.Client, sources map[types.SourceType]types.ISource) {
