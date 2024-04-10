@@ -16,11 +16,9 @@ import (
 type ContextKey string
 
 const (
-	configKey       ContextKey = "config_ctx_key"
-	configLoaderKey ContextKey = "config_loader_ctx_key"
-	librariesKey    ContextKey = "libraries_ctx_key"
-	sourcesKey      ContextKey = "sources_ctx_key"
-	httpKey         ContextKey = "http_ctx_key"
+	configKey    ContextKey = "config_ctx_key"
+	librariesKey ContextKey = "libraries_ctx_key"
+	sourcesKey   ContextKey = "sources_ctx_key"
 )
 
 func SetConfig(cmd types.ICommand, cfg types.Config) {

@@ -48,8 +48,13 @@ func TestDepFactory_Config(t *testing.T) {
 				"type":                 "libib",
 			},
 		}
-		vizSrc, err := viz.New(http.NewClientMock(t))
-		So(err, ShouldBeNil)
+		cmd := types.NewICommandMock(t)
+		client := http.NewClientMock(t)
+
+		cmd.On("Context").Return(ctx)
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
+
+		vizSrc := viz.New(cmd)
 
 		sourceSetting := vizSrc.SourceSettingFromConfig(settingMap)
 
@@ -148,27 +153,16 @@ func TestLoadDI(t *testing.T) {
 
 		getCall := cmdMock.On("Context").Maybe()
 		setCall := cmdMock.On("SetContext", mock.Anything).Maybe()
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(clientMock).Maybe()
+		ctx.On("Value", ctxu.ContextKey("wiki_getter_ctx_key")).Return(wikiMock).Maybe()
 
 		Convey("should set source in context", func() {
-			getCall.Once().Return(ctx)
+			getCall.Times(6).Return(ctx)
 			setCall.Once().Return()
 
 			err := factory.Sources(cmdMock, clientMock, wikiMock)
 
 			So(err, ShouldBeNil)
-		})
-
-		Convey("should return error when", func() {
-			Convey("client mock is nil", func() {
-				err := factory.Sources(cmdMock, nil, wikiMock)
-
-				So(err, ShouldBeError, "http client is nil")
-			})
-			Convey("wiki mock is nil", func() {
-				err := factory.Sources(cmdMock, clientMock, nil)
-
-				So(err, ShouldBeError, "wikipedia table getter is nil")
-			})
 		})
 	})
 }

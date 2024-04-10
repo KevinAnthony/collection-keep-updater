@@ -47,31 +47,11 @@ func GetDIFactory(cmd types.ICommand) IDepFactory {
 }
 
 func (depFactory) Sources(cmd types.ICommand, httpClient http.Client, wikiGetter client.TableGetter) error {
-	vizSource, err := viz.New(httpClient)
-	if err != nil {
-		return err
-	}
-
-	wikiSource, err := wikipedia.New(httpClient, wikiGetter)
-	if err != nil {
-		return err
-	}
-
-	yenSource, err := yen.New(httpClient)
-	if err != nil {
-		return err
-	}
-
-	kodanshaSource, err := kodansha.New(httpClient)
-	if err != nil {
-		return err
-	}
-
 	sources := map[types.SourceType]types.ISource{
-		types.WikipediaSource: wikiSource,
-		types.VizSource:       vizSource,
-		types.YenSource:       yenSource,
-		types.Kodansha:        kodanshaSource,
+		types.WikipediaSource: wikipedia.New(cmd),
+		types.VizSource:       viz.New(cmd),
+		types.YenSource:       yen.New(cmd),
+		types.Kodansha:        kodansha.New(cmd),
 	}
 
 	ctxu.SetDI(cmd, httpClient, sources)

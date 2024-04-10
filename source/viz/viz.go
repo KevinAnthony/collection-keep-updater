@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
+
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 	"github.com/kevinanthony/gorps/v2/http"
@@ -25,15 +27,11 @@ type viz struct {
 	client http.Client
 }
 
-func New(client http.Client) (types.ISource, error) {
-	if client == nil {
-		return nil, errors.New("http client is nil")
-	}
-
+func New(cmd types.ICommand) types.ISource {
 	return viz{
 		settingsHelper: settingsHelper{},
-		client:         client,
-	}, nil
+		client:         ctxu.GetHttpClient(cmd),
+	}
 }
 
 func (v viz) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {
