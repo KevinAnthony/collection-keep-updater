@@ -160,7 +160,7 @@ func TestLoadDI(t *testing.T) {
 			getCall.Times(6).Return(ctx)
 			setCall.Once().Return()
 
-			err := factory.Sources(cmdMock, clientMock, wikiMock)
+			err := factory.Sources(cmdMock)
 
 			So(err, ShouldBeNil)
 		})

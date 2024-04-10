@@ -10,18 +10,15 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
 	"github.com/kevinanthony/collection-keep-updater/types"
-	"github.com/kevinanthony/gorps/v2/http"
-
-	"github.com/atye/wikitable2json/pkg/client"
 )
 
 const (
 	depFactoryKey ctxu.ContextKey = "dep_factory_ctx_key"
 )
 
-//go:generate mockery --name=IDepFactory --structname=IDepFactoryMock --filename=di_mock.go --inpackage
+//go:generate mockery --name=IDepFactory --structname=IDepFactoryMock --filename=factory_mock.go --inpackage
 type IDepFactory interface {
-	Sources(cmd types.ICommand, httpClient http.Client, wikiGetter client.TableGetter) error
+	Sources(cmd types.ICommand) error
 	Config(cmd types.ICommand, icfg types.IConfig) error
 }
 
@@ -46,7 +43,7 @@ func GetDIFactory(cmd types.ICommand) IDepFactory {
 	return v
 }
 
-func (depFactory) Sources(cmd types.ICommand, httpClient http.Client, wikiGetter client.TableGetter) error {
+func (depFactory) Sources(cmd types.ICommand) error {
 	sources := map[types.SourceType]types.ISource{
 		types.WikipediaSource: wikipedia.New(cmd),
 		types.VizSource:       viz.New(cmd),
@@ -54,7 +51,7 @@ func (depFactory) Sources(cmd types.ICommand, httpClient http.Client, wikiGetter
 		types.Kodansha:        kodansha.New(cmd),
 	}
 
-	ctxu.SetDI(cmd, httpClient, sources)
+	ctxu.SetSources(cmd, sources)
 
 	return nil
 }

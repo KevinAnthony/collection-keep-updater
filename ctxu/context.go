@@ -38,11 +38,10 @@ func GetConfig(cmd types.ICommand) (types.Config, error) {
 	return types.Config{}, errors.New("configuration not found in context")
 }
 
-func SetDI(cmd types.ICommand, httpClient http.Client, sources map[types.SourceType]types.ISource) {
+func SetSources(cmd types.ICommand, sources map[types.SourceType]types.ISource) {
 	ctx := cmd.Context()
 
 	ctx = context.WithValue(ctx, sourcesKey, sources)
-	ctx = context.WithValue(ctx, httpKey, httpClient)
 
 	cmd.SetContext(ctx)
 }

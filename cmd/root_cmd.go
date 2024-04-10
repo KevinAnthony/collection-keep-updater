@@ -6,10 +6,6 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/di"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/updater"
-	"github.com/kevinanthony/gorps/v2/encoder"
-	"github.com/kevinanthony/gorps/v2/http"
-
-	"github.com/atye/wikitable2json/pkg/client"
 	"github.com/spf13/cobra"
 )
 
@@ -24,14 +20,12 @@ Configure it with different sources and it will compare what you already have li
 func PreREunE(cmd *cobra.Command, _ []string) error {
 	viperConfig := ctxu.GetConfigReader(cmd)
 	factory := di.GetDIFactory(cmd)
-	httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
-	wikiGetter := client.NewTableGetter("noside")
 
 	if err := factory.Config(cmd, viperConfig); err != nil {
 		return err
 	}
 
-	if err := factory.Sources(cmd, httpClient, wikiGetter); err != nil {
+	if err := factory.Sources(cmd); err != nil {
 		return err
 	}
 

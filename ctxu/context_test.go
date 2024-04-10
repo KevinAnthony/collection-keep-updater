@@ -145,7 +145,6 @@ func TestSetDI(t *testing.T) {
 	t.Parallel()
 
 	Convey("SetDi", t, func() {
-		httpMock := http.NewClientMock(t)
 		cmdMock := types.NewICommandMock(t)
 		ctx := context.Background()
 
@@ -155,7 +154,7 @@ func TestSetDI(t *testing.T) {
 			cmdMock.On("Context").Once().Return(ctx)
 			cmdMock.On("SetContext", mock.Anything).Once()
 
-			ctxu.SetDI(cmdMock, httpMock, sources)
+			ctxu.SetSources(cmdMock, sources)
 		})
 	})
 }
