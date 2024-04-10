@@ -3,11 +3,11 @@ package ctxu
 import (
 	"context"
 
-	"github.com/atye/wikitable2json/pkg/client"
+	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/encoder"
 	"github.com/kevinanthony/gorps/v2/http"
 
-	"github.com/kevinanthony/collection-keep-updater/types"
+	"github.com/atye/wikitable2json/pkg/client"
 	"github.com/spf13/viper"
 )
 

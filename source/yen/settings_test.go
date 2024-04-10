@@ -2,9 +2,9 @@ package yen_test
 
 import (
 	"bytes"
-	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"testing"
 
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"

@@ -4,10 +4,9 @@ import (
 	"testing"
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
-	"github.com/kevinanthony/gorps/v2/http"
-
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/types"
+	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/pkg/errors"
 	. "github.com/smartystreets/goconvey/convey"

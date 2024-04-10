@@ -4,14 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
-
-	"github.com/kevinanthony/gorps/v2/encoder"
-
-	"github.com/kevinanthony/gorps/v2/http"
-
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
+	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/types"
+	"github.com/kevinanthony/gorps/v2/encoder"
+	"github.com/kevinanthony/gorps/v2/http"
 
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/spf13/viper"
