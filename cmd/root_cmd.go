@@ -6,6 +6,7 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/di"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/updater"
+
 	"github.com/spf13/cobra"
 )
 
