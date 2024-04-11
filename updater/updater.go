@@ -9,6 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const updaterCtxKey ctxu.ContextKey = "updater_ctx_key"
+
 //go:generate mockery --name=IUpdater --structname=IUpdaterMock --filename=updater_mock.go --inpackage
 type IUpdater interface {
 	GetAllAvailableBooks(cmd types.ICommand, series []types.Series) (types.ISBNBooks, error)
@@ -19,6 +21,21 @@ type updater struct{}
 
 func NewUpdater() IUpdater {
 	return updater{}
+}
+
+func GetUpdater(cmd types.ICommand) IUpdater {
+	ctx := cmd.Context()
+
+	value := ctx.Value(updaterCtxKey)
+	if client, ok := value.(IUpdater); ok {
+		return client
+	}
+
+	u := NewUpdater()
+	ctx = context.WithValue(ctx, updaterCtxKey, u)
+	cmd.SetContext(ctx)
+
+	return u
 }
 
 func (u updater) UpdateLibrary(ctx context.Context, library types.ILibrary, availableBooks types.ISBNBooks) (types.ISBNBooks, error) {

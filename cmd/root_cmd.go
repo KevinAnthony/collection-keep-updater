@@ -15,10 +15,10 @@ var rootCmd = &cobra.Command{
 	Short: "Keep your book wanted library up to date",
 	Long: `Keep your book collection wanted section up to date.  
 Configure it with different sources and it will compare what you already have listed with what is available and generate a wanted list.`,
-	PersistentPreRunE: PreREunE,
+	PersistentPreRunE: types.CmdRun(PreRunE),
 }
 
-func PreREunE(cmd *cobra.Command, _ []string) error {
+func PreRunE(cmd types.ICommand) error {
 	viperConfig := ctxu.GetConfigReader(cmd)
 	factory := di.GetDIFactory(cmd)
 
@@ -30,7 +30,7 @@ func PreREunE(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	return ctxu.SetLibraries(cmd)
+	return factory.Libraries(cmd)
 }
 
 func init() {

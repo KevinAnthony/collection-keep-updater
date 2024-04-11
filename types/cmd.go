@@ -36,13 +36,13 @@ type IConfig interface {
 	Get(key string) any
 }
 
-func CmdRunE(f func(cmd ICommand, args []string) error) func(cmd *cobra.Command, args []string) error {
-	return func(cmd *cobra.Command, args []string) error {
-		return f(cmd, args)
+func CmdRun(f func(cmd ICommand) error) func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, _ []string) error {
+		return f(cmd)
 	}
 }
 
-func CmdArgs(f func(cmd ICommand, args []string) error) cobra.PositionalArgs {
+func CmdRunArgs(f func(cmd ICommand, args []string) error) cobra.PositionalArgs {
 	return func(cmd *cobra.Command, args []string) error {
 		return f(cmd, args)
 	}

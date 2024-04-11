@@ -42,9 +42,10 @@ func TestRun(t *testing.T) {
 		wanted := types.ISBNBooks{{Title: "test book", ISBN13: "1234567890abc"}}
 		flags := &pflag.FlagSet{}
 
-		getCtxCall := cmd.On("Context").Maybe()
+		getCtxCall := cmd.On("Context").Return(ctx).Maybe()
 		getCfgCall := ctx.On("Value", ctxu.ContextKey("config_ctx_key")).Maybe()
 		getLibCall := ctx.On("Value", ctxu.ContextKey("libraries_ctx_key")).Maybe()
+		getUpdaterCall := ctx.On("Value", ctxu.ContextKey("updater_ctx_key")).Return(updateMock).Maybe()
 		getBooksCall := updateMock.On("GetAllAvailableBooks", cmd, series).Maybe()
 		updateCall := updateMock.On("UpdateLibrary", ctx, libMock, books).Maybe()
 		flagCall := cmd.On("PersistentFlags").Maybe()
@@ -56,7 +57,8 @@ func TestRun(t *testing.T) {
 				flags.Bool("print-config", true, "")
 				flags.Bool("write-config", false, "")
 
-				getCtxCall.Times(3).Return(ctx)
+				getUpdaterCall.Once()
+				getCtxCall.Times(4)
 				getCfgCall.Once().Return(cfg, nil)
 				getLibCall.Once().Return(libs, nil)
 				getBooksCall.Once().Return(books, nil)
@@ -64,7 +66,7 @@ func TestRun(t *testing.T) {
 				flagCall.Once().Return(flags)
 				cmd.On("OutOrStdout").Once().Return(buff)
 
-				err := updater.Run(cmd, updateMock)
+				err := updater.Run(cmd)
 
 				So(err, ShouldBeNil)
 				So(buff.String(), ShouldResemble, `┌───────────┬────────┬─────────┬───────────────┬────────┐
@@ -78,7 +80,8 @@ func TestRun(t *testing.T) {
 				flags.Bool("print-config", false, "")
 				flags.Bool("write-config", true, "")
 
-				getCtxCall.Times(3).Return(ctx)
+				getCtxCall.Times(4)
+				getUpdaterCall.Once()
 				getCfgCall.Once().Return(cfg, nil)
 				getLibCall.Once().Return(libs, nil)
 				getBooksCall.Once().Return(books, nil)
@@ -86,58 +89,61 @@ func TestRun(t *testing.T) {
 				flagCall.Twice().Return(flags)
 				saveCall.Once().Return(nil)
 
-				err := updater.Run(cmd, updateMock)
+				err := updater.Run(cmd)
 
 				So(err, ShouldBeNil)
 			})
 			Convey("and wanted was zero length", func() {
-				getCtxCall.Times(3).Return(ctx)
+				getCtxCall.Times(4)
+				getUpdaterCall.Once()
 				getCfgCall.Once().Return(cfg, nil)
 				getLibCall.Once().Return(libs, nil)
 				getBooksCall.Once().Return(books, nil)
 				updateCall.Once().Return(types.ISBNBooks{}, nil)
 
-				err := updater.Run(cmd, updateMock)
+				err := updater.Run(cmd)
 
 				So(err, ShouldBeNil)
 			})
 		})
 		Convey("should return error when", func() {
 			Convey("get config returns error", func() {
-				getCtxCall.Once().Return(ctx)
+				getCtxCall.Once()
 				getCfgCall.Once().Return(nil, errors.New("get config error"))
 
-				err := updater.Run(cmd, updateMock)
+				err := updater.Run(cmd)
 
 				So(err, ShouldBeError, "configuration not found in context")
 			})
 			Convey("get libraries returns error", func() {
-				getCtxCall.Twice().Return(ctx)
+				getCtxCall.Twice()
 				getCfgCall.Once().Return(cfg, nil)
 				getLibCall.Once().Return(nil, errors.New("library error"))
 
-				err := updater.Run(cmd, updateMock)
+				err := updater.Run(cmd)
 
 				So(err, ShouldBeError, "libraries not found in context")
 			})
 			Convey("get available books returns an error", func() {
-				getCtxCall.Twice().Return(ctx)
+				getCtxCall.Times(3)
+				getUpdaterCall.Once()
 				getCfgCall.Once().Return(cfg, nil)
 				getLibCall.Once().Return(libs, nil)
 				getBooksCall.Once().Return(nil, errors.New("get book error"))
 
-				err := updater.Run(cmd, updateMock)
+				err := updater.Run(cmd)
 
 				So(err, ShouldBeError, "get book error")
 			})
 			Convey("update lib returns an error", func() {
-				getCtxCall.Times(3).Return(ctx)
+				getCtxCall.Times(4)
+				getUpdaterCall.Once()
 				getCfgCall.Once().Return(cfg, nil)
 				getLibCall.Once().Return(libs, nil)
 				getBooksCall.Once().Return(books, nil)
 				updateCall.Once().Return(nil, errors.New("update book error"))
 
-				err := updater.Run(cmd, updateMock)
+				err := updater.Run(cmd)
 
 				So(err, ShouldBeError, "update book error")
 			})
@@ -145,7 +151,8 @@ func TestRun(t *testing.T) {
 				flags.Bool("print-config", false, "")
 				flags.Bool("write-config", true, "")
 
-				getCtxCall.Times(3).Return(ctx)
+				getCtxCall.Times(4)
+				getUpdaterCall.Once()
 				getCfgCall.Once().Return(cfg, nil)
 				getLibCall.Once().Return(libs, nil)
 				getBooksCall.Once().Return(books, nil)
@@ -153,7 +160,7 @@ func TestRun(t *testing.T) {
 				flagCall.Twice().Return(flags)
 				saveCall.Once().Return(errors.New("save books error"))
 
-				err := updater.Run(cmd, updateMock)
+				err := updater.Run(cmd)
 
 				So(err, ShouldBeError, "save books error")
 			})

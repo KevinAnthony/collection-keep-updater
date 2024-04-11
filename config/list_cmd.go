@@ -17,7 +17,7 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list one or all configurations",
-	RunE:  types.CmdRunE(runList),
+	RunE:  types.CmdRunArgs(runList),
 }
 
 func runList(cmd types.ICommand, args []string) error {

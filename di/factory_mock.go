@@ -26,6 +26,20 @@ func (_m *IDepFactoryMock) Config(cmd types.ICommand, icfg types.IConfig) error 
 	return r0
 }
 
+// Libraries provides a mock function with given fields: cmd
+func (_m *IDepFactoryMock) Libraries(cmd types.ICommand) error {
+	ret := _m.Called(cmd)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(types.ICommand) error); ok {
+		r0 = rf(cmd)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Sources provides a mock function with given fields: cmd
 func (_m *IDepFactoryMock) Sources(cmd types.ICommand) error {
 	ret := _m.Called(cmd)

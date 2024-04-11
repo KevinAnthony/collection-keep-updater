@@ -4,7 +4,11 @@ import (
 	"testing"
 
 	"github.com/kevinanthony/collection-keep-updater/cmd"
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
+	"github.com/kevinanthony/collection-keep-updater/di"
+	"github.com/kevinanthony/collection-keep-updater/types"
 
+	"github.com/pkg/errors"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -17,72 +21,57 @@ func TestGetRootCmd(t *testing.T) {
 	})
 }
 
-//func TestPreREunE(t *testing.T) {
-//	t.Parallel()
-//
-//	Convey("PreREunE", t, func() {
-//		ctx := ctxu.NewContextMock(t)
-//		sourceMock := types.NewISouceMock(t)
-//		cfgMock := types.NewIConfigMock(t)
-//		//source := types.NewISouceMock(t)
-//
-//		command := &cobra.Command{}
-//		command.SetContext(ctx)
-//		settingMap := map[string]any{
-//			"delay_between":   "100ms",
-//			"maximum_backlog": 2,
-//		}
-//		//settingMap := map[string]any{
-//		//	"delay_between":   "100ms",
-//		//	"maximum_backlog": 2,
-//		//}
-//		seriesBlob := []any{
-//			map[string]any{
-//				"id":              "one-piece",
-//				"key":             "one-piece",
-//				"name":            "One Piece",
-//				"source":          "viz",
-//				"source_settings": settingMap,
-//				"isbn_blacklist":  []any{"one", "two", "five"},
-//			},
-//		}
-//		libraryBlob := []any{
-//			map[string]any{
-//				"api_key":              "secret",
-//				"other_collection_ids": []any{"id1", "id2", "id3"},
-//				"wanted_collection_id": "id0",
-//				"type":                 "libib",
-//			},
-//		}
-//		vizSrc, err := viz.New(http.NewClientMock(t))
-//		So(err, ShouldBeNil)
-//
-//		readCall := mockLoadCfg(cfgMock)
-//
-//		sourceSetting := vizSrc.SourceSettingFromConfig(settingMap)
-//
-//		sources := map[types.SourceType]types.ISource{types.VizSource: sourceMock}
-//
-//		getConfigCall := ctx.On("Value", ctxu.ContextKey("i_config_ctx_key")).Return(cfgMock).Maybe()
-//		getSourceCall := ctx.On("Value", ctxu.ContextKey("sources_ctx_key")).Return(sources).Maybe()
-//		sourceSettingsCall := sourceMock.On("SourceSettingFromConfig", settingMap).Maybe()
-//		getSeriesCall := cfgMock.On("Get", "series").Maybe()
-//		getLibCall := cfgMock.On("Get", "libraries").Maybe()
-//		ctxCall := ctx.On("Value", ctxu.ContextKey("sources_ctx_key")).Maybe()
-//
-//		Convey("should return no errors", func() {
-//			getConfigCall.Once()
-//			getSourceCall.Once()
-//			readCall.Return(nil)
-//			getSeriesCall.Return(seriesBlob).Once()
-//			ctxCall.Return(sources).Once()
-//			sourceSettingsCall.Return(sourceSetting).Once()
-//
-//			getLibCall.Return(libraryBlob).Once()
-//
-//			err := cmd.PreREunE(command, nil)
-//
-//			So(err, ShouldBeNil)
-//		})
-//	})
-//}
+func TestPreRunE(t *testing.T) {
+	t.Parallel()
+
+	Convey("TestPreRunE", t, func() {
+		ctx := ctxu.NewContextMock(t)
+		command := types.NewICommandMock(t)
+		factory := di.NewIDepFactoryMock(t)
+		cfgLoader := types.NewIConfigMock(t)
+
+		_ = factory
+		command.On("Context").Return(ctx).Times(2)
+		ctx.On("Value", ctxu.ContextKey("config_loader_ctx_key")).Return(cfgLoader).Once()
+		ctx.On("Value", ctxu.ContextKey("dep_factory_ctx_key")).Return(factory).Once()
+		cfgCall := factory.On("Config", command, cfgLoader).Maybe()
+		srcCall := factory.On("Sources", command).Maybe()
+		libCall := factory.On("Libraries", command).Maybe()
+
+		Convey("should return no errors", func() {
+			cfgCall.Return(nil).Once()
+			srcCall.Return(nil).Once()
+			libCall.Return(nil).Once()
+
+			err := cmd.PreRunE(command)
+
+			So(err, ShouldBeNil)
+		})
+		Convey("should return error when", func() {
+			Convey("config returns an error", func() {
+				cfgCall.Return(errors.New("cfg error")).Once()
+
+				err := cmd.PreRunE(command)
+
+				So(err, ShouldBeError, "cfg error")
+			})
+			Convey("sources returns an error", func() {
+				cfgCall.Return(nil).Once()
+				srcCall.Return(errors.New("source error")).Once()
+
+				err := cmd.PreRunE(command)
+
+				So(err, ShouldBeError, "source error")
+			})
+			Convey("libraries returns an error", func() {
+				cfgCall.Return(nil).Once()
+				srcCall.Return(nil).Once()
+				libCall.Return(errors.New("lib error")).Once()
+
+				err := cmd.PreRunE(command)
+
+				So(err, ShouldBeError, "lib error")
+			})
+		})
+	})
+}
