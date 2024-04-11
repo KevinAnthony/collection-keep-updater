@@ -21,18 +21,17 @@ func TestNew(t *testing.T) {
 	t.Parallel()
 
 	Convey("New", t, func() {
+		cmd := types.NewICommandMock(t)
+		ctx := ctxu.NewContextMock(t)
 		client := http.NewClientMock(t)
+
+		cmd.On("Context").Return(ctx)
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
+
 		Convey("should return isource when http client is valid", func() {
-			source, err := yen.New(client)
+			source := yen.New(cmd)
 
 			So(source, ShouldNotBeNil)
-			So(err, ShouldBeNil)
-		})
-		Convey("should return error when http client is nil", func() {
-			source, err := yen.New(nil)
-
-			So(err, ShouldBeError, "http client is nil")
-			So(source, ShouldBeNil)
 		})
 	})
 }
@@ -45,6 +44,10 @@ func TestYen_GetISBNs(t *testing.T) {
 		client := http.NewClientMock(t)
 		ctx := ctxu.NewContextMock(t)
 		bodyMock := http.NewBodyMock(t)
+		cmd := types.NewICommandMock(t)
+
+		cmd.On("Context").Return(ctx)
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
 
 		series := types.Series{ID: id}
 		expected := types.ISBNBooks{
@@ -69,8 +72,7 @@ func TestYen_GetISBNs(t *testing.T) {
 			types.ISBNBook{ISBN10: "", ISBN13: "9781975393403", Title: " Vol. 19", Volume: "19", Source: "Yen Press"},
 		}
 
-		source, err := yen.New(client)
-		So(err, ShouldBeNil)
+		source := yen.New(cmd)
 
 		firstCall := client.On("Do", mock.MatchedBy(matchFunc(id+"?next_ord=999"))).Maybe()
 		secondCall := client.On("Do", mock.MatchedBy(matchFunc("?next_ord=4"))).Maybe()

@@ -16,7 +16,7 @@ const (
 var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "add a new configuration",
-	RunE:  types.CmdRunE(runAdd),
+	RunE:  types.CmdRun(runAdd),
 }
 
 func init() {
@@ -29,7 +29,7 @@ func init() {
 	seriesSetFlags(addCmd)
 }
 
-func runAdd(cmd types.ICommand, args []string) error {
+func runAdd(cmd types.ICommand) error {
 	switch {
 	case utils.GetFlagBool(cmd, seriesFlag):
 		s, err := newSeriesConfig(cmd)
@@ -58,10 +58,7 @@ func runAdd(cmd types.ICommand, args []string) error {
 			}
 
 			cfg.Series = append(cfg.Series, s)
-			icfg, err := ctxu.GetConfigReader(cmd)
-			if err != nil {
-				return err
-			}
+			icfg := ctxu.GetConfigReader(cmd)
 
 			icfg.Set("series", cfg.Series)
 

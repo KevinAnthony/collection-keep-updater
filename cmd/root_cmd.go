@@ -3,18 +3,11 @@ package cmd
 import (
 	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
-	"github.com/kevinanthony/collection-keep-updater/source/kodansha"
-	"github.com/kevinanthony/collection-keep-updater/source/viz"
-	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
-	"github.com/kevinanthony/collection-keep-updater/source/yen"
+	"github.com/kevinanthony/collection-keep-updater/di"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/updater"
-	"github.com/kevinanthony/gorps/v2/encoder"
-	"github.com/kevinanthony/gorps/v2/http"
 
-	"github.com/atye/wikitable2json/pkg/client"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var rootCmd = &cobra.Command{
@@ -22,100 +15,27 @@ var rootCmd = &cobra.Command{
 	Short: "Keep your book wanted library up to date",
 	Long: `Keep your book collection wanted section up to date.  
 Configure it with different sources and it will compare what you already have listed with what is available and generate a wanted list.`,
-	PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-		viperConfig := viper.New()
-		httpClient := http.NewClient(http.NewNativeClient(), encoder.NewFactory())
-		wikiGetter := client.NewTableGetter("noside")
+	PersistentPreRunE: types.CmdRun(PreRunE),
+}
 
-		if err := LoadConfig(cmd, viperConfig); err != nil {
-			return err
-		}
+func PreRunE(cmd types.ICommand) error {
+	viperConfig := ctxu.GetConfigReader(cmd)
+	factory := di.GetDIFactory(cmd)
 
-		if err := LoadSources(cmd, httpClient, wikiGetter); err != nil {
-			return err
-		}
+	if err := factory.Config(cmd, viperConfig); err != nil {
+		return err
+	}
 
-		return ctxu.SetLibraries(cmd)
-	},
+	if err := factory.Sources(cmd); err != nil {
+		return err
+	}
+
+	return factory.Libraries(cmd)
 }
 
 func init() {
 	rootCmd.AddCommand(config.GetCmd())
 	rootCmd.AddCommand(updater.GetCmd())
-}
-
-func LoadSources(cmd types.ICommand, httpClient http.Client, wikiGetter client.TableGetter) error {
-	vizSource, err := viz.New(httpClient)
-	if err != nil {
-		return err
-	}
-
-	wikiSource, err := wikipedia.New(httpClient, wikiGetter)
-	if err != nil {
-		return err
-	}
-
-	yenSource, err := yen.New(httpClient)
-	if err != nil {
-		return err
-	}
-
-	kodanshaSource, err := kodansha.New(httpClient)
-	if err != nil {
-		return err
-	}
-
-	sources := map[types.SourceType]types.ISource{
-		types.WikipediaSource: wikiSource,
-		types.VizSource:       vizSource,
-		types.YenSource:       yenSource,
-		types.Kodansha:        kodanshaSource,
-	}
-
-	ctxu.SetDI(cmd, httpClient, sources)
-
-	return nil
-}
-
-func LoadConfig(
-	cmd types.ICommand,
-	icfg types.IConfig,
-) error {
-	icfg.AddConfigPath("$HOME/.config/noside/")
-	icfg.AddConfigPath(".")
-	icfg.SetConfigType("yaml")
-	icfg.SetConfigName("config")
-	icfg.AutomaticEnv()
-
-	if err := icfg.ReadInConfig(); err != nil {
-		return err
-	}
-
-	var cfg types.Config
-
-	seriesSlice := icfg.Get("series").([]interface{})
-	for _, data := range seriesSlice {
-		series, err := config.GetSeries(cmd, data)
-		if err != nil {
-			return err
-		}
-
-		cfg.Series = append(cfg.Series, series)
-	}
-
-	libSlice := icfg.Get("libraries").([]interface{})
-	for _, data := range libSlice {
-		library, err := config.GetLibrary(cmd, data)
-		if err != nil {
-			return err
-		}
-
-		cfg.Libraries = append(cfg.Libraries, library)
-	}
-
-	ctxu.SetConfig(cmd, icfg, cfg)
-
-	return nil
 }
 
 func GetRootCmd() types.ICommand {

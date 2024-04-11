@@ -3,6 +3,7 @@ package yen_test
 import (
 	"testing"
 
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
@@ -91,10 +92,14 @@ func TestSettingsHelper_GetIDFromURL(t *testing.T) {
 }
 
 func getSource(t *testing.T) types.ISource {
+	t.Helper()
+
+	cmd := types.NewICommandMock(t)
+	ctx := ctxu.NewContextMock(t)
 	client := http.NewClientMock(t)
 
-	source, err := yen.New(client)
-	So(err, ShouldBeNil)
+	cmd.On("Context").Return(ctx)
+	ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
 
-	return source
+	return yen.New(cmd)
 }

@@ -22,18 +22,17 @@ func TestNew(t *testing.T) {
 	t.Parallel()
 
 	Convey("New", t, func() {
+		cmd := types.NewICommandMock(t)
+		ctx := ctxu.NewContextMock(t)
 		client := http.NewClientMock(t)
+
+		cmd.On("Context").Return(ctx)
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
+
 		Convey("should return isource when http client is valid", func() {
-			source, err := viz.New(client)
+			source := viz.New(cmd)
 
 			So(source, ShouldNotBeNil)
-			So(err, ShouldBeNil)
-		})
-		Convey("should return error when http client is nil", func() {
-			source, err := viz.New(nil)
-
-			So(err, ShouldBeError, "http client is nil")
-			So(source, ShouldBeNil)
 		})
 	})
 }
@@ -74,8 +73,12 @@ func TestViz_GetISBNs(t *testing.T) {
 				Source: "Viz",
 			},
 		}
-		source, err := viz.New(client)
-		So(err, ShouldBeNil)
+		cmd := types.NewICommandMock(t)
+
+		cmd.On("Context").Return(ctx)
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
+
+		source := viz.New(cmd)
 
 		seriesCall := client.On("Do", mock.MatchedBy(matchFunc(id+"/all"))).Maybe()
 		page1Call := client.On("Do", mock.MatchedBy(matchFunc("6419"))).Maybe()

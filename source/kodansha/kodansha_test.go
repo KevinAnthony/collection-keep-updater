@@ -21,18 +21,17 @@ func TestNew(t *testing.T) {
 	t.Parallel()
 
 	Convey("New", t, func() {
+		cmd := types.NewICommandMock(t)
+		ctx := ctxu.NewContextMock(t)
 		client := http.NewClientMock(t)
-		Convey("should return isource when http client is valid", func() {
-			source, err := kodansha.New(client)
+
+		cmd.On("Context").Return(ctx)
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
+
+		Convey("should return isource", func() {
+			source := kodansha.New(cmd)
 
 			So(source, ShouldNotBeNil)
-			So(err, ShouldBeNil)
-		})
-		Convey("should return error when http client is nil", func() {
-			source, err := kodansha.New(nil)
-
-			So(err, ShouldBeError, "http client is nil")
-			So(source, ShouldBeNil)
 		})
 	})
 }
@@ -43,14 +42,17 @@ func TestKodansha_GetISBNs(t *testing.T) {
 	Convey("GetISBNs", t, func() {
 		id := "initial-d-test"
 		client := http.NewClientMock(t)
+		cmd := types.NewICommandMock(t)
 		ctx := ctxu.NewContextMock(t)
 		bodyMock := http.NewBodyMock(t)
 
 		series := types.Series{ID: id}
 		expected := types.ISBNBooks{{ISBN13: "9798888770986", Volume: "1", Title: "Initial D Omnibus, Volume 1", Source: "Kodansha"}}
 
-		source, err := kodansha.New(client)
-		So(err, ShouldBeNil)
+		cmd.On("Context").Return(ctx)
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
+
+		source := kodansha.New(cmd)
 
 		seriesCall := client.On("Do", mock.MatchedBy(matchFunc(id))).Maybe()
 

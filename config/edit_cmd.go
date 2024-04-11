@@ -11,7 +11,7 @@ import (
 var editCmd = &cobra.Command{
 	Use:   "edit",
 	Short: "edit an existing configuration",
-	RunE:  types.CmdRunE(runEdit),
+	RunE:  types.CmdRun(runEdit),
 }
 
 func init() {
@@ -24,7 +24,7 @@ func init() {
 	seriesSetFlags(editCmd)
 }
 
-func runEdit(cmd types.ICommand, args []string) error {
+func runEdit(cmd types.ICommand) error {
 	cfg, err := ctxu.GetConfig(cmd)
 	if err != nil {
 		return err
@@ -58,10 +58,7 @@ func runEdit(cmd types.ICommand, args []string) error {
 			}
 
 			cfg.Series = append(cfg.Series, *s)
-			icfg, err := ctxu.GetConfigReader(cmd)
-			if err != nil {
-				return err
-			}
+			icfg := ctxu.GetConfigReader(cmd)
 
 			icfg.Set("series", cfg.Series)
 

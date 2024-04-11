@@ -20,16 +20,14 @@ func TestSetConfig(t *testing.T) {
 		cfg := types.Config{}
 		ctx := context.Background()
 		cmdMock := types.NewICommandMock(t)
-		cfgMock := types.NewIConfigMock(t)
 
-		midCtx := context.WithValue(ctx, ctxu.ContextKey("config_ctx_key"), cfg)
-		expectedCtx2 := context.WithValue(midCtx, ctxu.ContextKey("i_config_ctx_key"), cfgMock)
+		valueCtx := context.WithValue(ctx, ctxu.ContextKey("config_ctx_key"), cfg)
 
 		Convey("should set the cfg into the context of the command", func() {
 			cmdMock.On("Context").Once().Return(ctx)
-			cmdMock.On("SetContext", expectedCtx2).Once()
+			cmdMock.On("SetContext", valueCtx).Once()
 
-			ctxu.SetConfig(cmdMock, cfgMock, cfg)
+			ctxu.SetConfig(cmdMock, cfg)
 		})
 	})
 }
@@ -64,77 +62,23 @@ func TestGetConfig(t *testing.T) {
 	})
 }
 
-func TestGetConfigReader(t *testing.T) {
-	t.Parallel()
-
-	Convey("GetConfigReader", t, func() {
-		ctx := ctxu.NewContextMock(t)
-		cmdMock := types.NewICommandMock(t)
-		cfgMock := types.NewIConfigMock(t)
-
-		cmdCall := cmdMock.On("Context").Once()
-		ctxCall := ctx.On("Value", ctxu.ContextKey("i_config_ctx_key")).Maybe()
-
-		Convey("should get this cfg from the context of the command", func() {
-			cmdCall.Return(ctx)
-			ctxCall.Once().Return(cfgMock)
-
-			actual, err := ctxu.GetConfigReader(cmdMock)
-
-			So(actual, ShouldResemble, cfgMock)
-			So(err, ShouldBeNil)
-		})
-		Convey("should return error when cfg not in context", func() {
-			cmdCall.Return(context.Background())
-
-			_, err := ctxu.GetConfigReader(cmdMock)
-
-			So(err, ShouldBeError, "configuration reader not found in context")
-		})
-	})
-}
-
 func TestSetLibraries(t *testing.T) {
 	t.Parallel()
 
 	Convey("SetLibraries", t, func() {
+		ctx := context.Background()
 		httpMock := http.NewClientMock(t)
-
 		settings := types.LibrarySettings{Name: types.LibIBLibrary}
-		cfg := types.Config{
-			Libraries: []types.LibrarySettings{settings},
-		}
 
 		libSettings := map[types.LibraryType]types.ILibrary{types.LibIBLibrary: libib.New(settings, httpMock)}
-		ctx := context.WithValue(context.Background(), ctxu.ContextKey("http_ctx_key"), httpMock)
-		ctx = context.WithValue(ctx, ctxu.ContextKey("config_ctx_key"), cfg)
-		expectedCtx := context.WithValue(ctx, ctxu.ContextKey("libraries_ctx_key"), libSettings)
+		expectedCtx := context.WithValue(context.Background(), ctxu.ContextKey("libraries_ctx_key"), libSettings)
 		cmdMock := types.NewICommandMock(t)
 
 		Convey("should set the cfg into the context of the command", func() {
-			cmdMock.On("Context").Twice().Return(ctx)
+			cmdMock.On("Context").Once().Return(ctx)
 			cmdMock.On("SetContext", expectedCtx).Once()
 
-			err := ctxu.SetLibraries(cmdMock)
-
-			So(err, ShouldBeNil)
-		})
-		Convey("should return error when", func() {
-			Convey("config is not in context", func() {
-				cmdMock.On("Context").Twice().Return(context.Background())
-
-				err := ctxu.SetLibraries(cmdMock)
-
-				So(err, ShouldBeError, "configuration not found in context")
-			})
-			Convey("http client is not in context", func() {
-				ctx := context.WithValue(context.Background(), ctxu.ContextKey("config_ctx_key"), cfg)
-				cmdMock.On("Context").Twice().Return(ctx)
-
-				err := ctxu.SetLibraries(cmdMock)
-
-				So(err, ShouldBeError, "http client not set in context")
-			})
+			ctxu.SetLibraries(cmdMock, libSettings)
 		})
 	})
 }
@@ -177,7 +121,6 @@ func TestSetDI(t *testing.T) {
 	t.Parallel()
 
 	Convey("SetDi", t, func() {
-		httpMock := http.NewClientMock(t)
 		cmdMock := types.NewICommandMock(t)
 		ctx := context.Background()
 
@@ -187,7 +130,7 @@ func TestSetDI(t *testing.T) {
 			cmdMock.On("Context").Once().Return(ctx)
 			cmdMock.On("SetContext", mock.Anything).Once()
 
-			ctxu.SetDI(cmdMock, httpMock, sources)
+			ctxu.SetSources(cmdMock, sources)
 		})
 	})
 }

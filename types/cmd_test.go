@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func TestCmdArgs(t *testing.T) {
+func TestCmdRunArgs(t *testing.T) {
 	t.Parallel()
 
-	Convey("CmdArgs", t, func() {
+	Convey("CmdRunArgs", t, func() {
 		cmd := &cobra.Command{}
 
 		Convey("should call f with cmd, and return error if func returns error", func() {
@@ -22,7 +22,7 @@ func TestCmdArgs(t *testing.T) {
 
 				return errors.New("this was called")
 			}
-			fn := types.CmdArgs(f)
+			fn := types.CmdRunArgs(f)
 
 			err := fn(cmd, nil)
 
@@ -31,17 +31,17 @@ func TestCmdArgs(t *testing.T) {
 	})
 }
 
-func TestCmdRunE(t *testing.T) {
-	Convey("CmdRunE", t, func() {
+func TestCmdRun(t *testing.T) {
+	Convey("CmdRun", t, func() {
 		cmd := &cobra.Command{}
 
 		Convey("should call f with cmd, and return error if func returns error", func() {
-			f := func(iCommand types.ICommand, args []string) error {
+			f := func(iCommand types.ICommand) error {
 				So(cmd, ShouldEqual, iCommand)
 
 				return errors.New("this was called")
 			}
-			fn := types.CmdRunE(f)
+			fn := types.CmdRun(f)
 
 			err := fn(cmd, nil)
 

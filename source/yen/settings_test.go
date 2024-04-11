@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
@@ -34,10 +35,14 @@ func TestYenSettings_Print(t *testing.T) {
 func getSettings(t *testing.T) types.ISourceSettings {
 	t.Helper()
 
+	cmd := types.NewICommandMock(t)
+	ctx := ctxu.NewContextMock(t)
 	client := http.NewClientMock(t)
 
-	source, err := yen.New(client)
-	So(err, ShouldBeNil)
+	cmd.On("Context").Return(ctx)
+	ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
+
+	source := yen.New(cmd)
 
 	return source.SourceSettingFromConfig(nil)
 }

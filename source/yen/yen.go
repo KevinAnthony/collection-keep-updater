@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 	"github.com/kevinanthony/gorps/v2/http"
 
-	"github.com/pkg/errors"
 	"golang.org/x/net/html"
 )
 
@@ -28,15 +28,11 @@ type yen struct {
 	client http.Client
 }
 
-func New(client http.Client) (types.ISource, error) {
-	if client == nil {
-		return nil, errors.New("http client is nil")
-	}
-
+func New(cmd types.ICommand) types.ISource {
 	return yen{
 		settingsHelper: settingsHelper{},
-		client:         client,
-	}, nil
+		client:         ctxu.GetHttpClient(cmd),
+	}
 }
 
 func (y yen) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {

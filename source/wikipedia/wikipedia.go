@@ -7,12 +7,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/utils"
 	"github.com/kevinanthony/gorps/v2/http"
 
 	"github.com/atye/wikitable2json/pkg/client"
-	"github.com/pkg/errors"
 )
 
 //go:generate mockery --srcpkg=github.com/atye/wikitable2json/pkg/client --name=TableGetter --structname=TableGetterMock --filename=table_getter_mock.go --output . --outpkg=wikipedia
@@ -27,19 +27,12 @@ type wikiSource struct {
 	tableGetter client.TableGetter
 }
 
-func New(client http.Client, getter client.TableGetter) (types.ISource, error) {
-	if client == nil {
-		return nil, errors.New("http client is nil")
-	}
-	if getter == nil {
-		return nil, errors.New("wikipedia table getter is nil")
-	}
-
+func New(cmd types.ICommand) types.ISource {
 	return wikiSource{
 		settingsHelper: settingsHelper{},
-		client:         client,
-		tableGetter:    getter,
-	}, nil
+		client:         ctxu.GetHttpClient(cmd),
+		tableGetter:    ctxu.GetWikiGetter(cmd),
+	}
 }
 
 func (l wikiSource) GetISBNs(ctx context.Context, series types.Series) (types.ISBNBooks, error) {

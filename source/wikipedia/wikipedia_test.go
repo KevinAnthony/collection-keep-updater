@@ -1,9 +1,9 @@
 package wikipedia_test
 
 import (
-	"context"
 	"testing"
 
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
@@ -16,28 +16,19 @@ func TestNew(t *testing.T) {
 	t.Parallel()
 
 	Convey("New", t, func() {
+		cmd := types.NewICommandMock(t)
+		ctx := ctxu.NewContextMock(t)
 		client := http.NewClientMock(t)
 		getter := wikipedia.NewTableGetterMock(t)
 
+		cmd.On("Context").Return(ctx)
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
+		ctx.On("Value", ctxu.ContextKey("wiki_getter_ctx_key")).Return(getter)
+
 		Convey("should return isource when http client is valid", func() {
-			source, err := wikipedia.New(client, getter)
+			source := wikipedia.New(cmd)
 
 			So(source, ShouldNotBeNil)
-			So(err, ShouldBeNil)
-		})
-		Convey("should return error when", func() {
-			Convey("http client is nil", func() {
-				source, err := wikipedia.New(nil, getter)
-
-				So(err, ShouldBeError, "http client is nil")
-				So(source, ShouldBeNil)
-			})
-			Convey("table getter is nil", func() {
-				source, err := wikipedia.New(client, nil)
-
-				So(err, ShouldBeError, "wikipedia table getter is nil")
-				So(source, ShouldBeNil)
-			})
 		})
 	})
 }
@@ -46,9 +37,14 @@ func TestWikiSource_GetISBNs(t *testing.T) {
 	t.Parallel()
 
 	Convey("GetISBNs", t, func() {
-		ctx := context.Background()
+		cmd := types.NewICommandMock(t)
+		ctx := ctxu.NewContextMock(t)
 		client := http.NewClientMock(t)
 		getter := wikipedia.NewTableGetterMock(t)
+
+		cmd.On("Context").Return(ctx)
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
+		ctx.On("Value", ctxu.ContextKey("wiki_getter_ctx_key")).Return(getter)
 
 		cfg := map[string]interface{}{
 			"volume_header": "v_header",
@@ -57,7 +53,7 @@ func TestWikiSource_GetISBNs(t *testing.T) {
 			"tables":        []interface{}{81},
 		}
 
-		source, err := wikipedia.New(client, getter)
+		source := wikipedia.New(cmd)
 
 		series := types.Series{ID: "one piece", Name: "sanji is mid", SourceSettings: source.SourceSettingFromConfig(cfg)}
 
@@ -78,7 +74,6 @@ func TestWikiSource_GetISBNs(t *testing.T) {
 			types.ISBNBook{Volume: "004", Title: "vol 4", ISBN13: "9781626925465", Source: "Wikipedia"},
 		}
 
-		So(err, ShouldBeNil)
 		Convey("should return ISBNs", func() {
 			Convey("when pages contains ISBN10 format", func() {
 				t1 := []map[string]string{
