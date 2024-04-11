@@ -6,10 +6,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kevinanthony/collection-keep-updater/library/libib"
-
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/di"
+	"github.com/kevinanthony/collection-keep-updater/library/libib"
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/types"

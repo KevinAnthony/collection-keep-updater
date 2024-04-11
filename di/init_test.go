@@ -7,6 +7,7 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/di"
 	"github.com/kevinanthony/collection-keep-updater/types"
+
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/stretchr/testify/mock"
 )
