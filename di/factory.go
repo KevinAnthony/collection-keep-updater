@@ -1,8 +1,6 @@
 package di
 
 import (
-	"context"
-
 	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/library/libib"
@@ -25,46 +23,6 @@ type IDepFactory interface {
 }
 
 type depFactory struct{}
-
-func (f depFactory) Libraries(cmd types.ICommand) error {
-	cfg, err := ctxu.GetConfig(cmd)
-	if err != nil {
-		return err
-	}
-
-	httpClient := ctxu.GetHttpClient(cmd)
-
-	libraries := map[types.LibraryType]types.ILibrary{}
-	for _, setting := range cfg.Libraries {
-		switch setting.Name {
-		case types.LibIBLibrary:
-			libraries[types.LibIBLibrary] = libib.New(setting, httpClient)
-		}
-	}
-
-	ctxu.SetLibraries(cmd, libraries)
-
-	return nil
-}
-
-func NewDepFactory() IDepFactory {
-	return depFactory{}
-}
-
-func GetDIFactory(cmd types.ICommand) IDepFactory {
-	ctx := cmd.Context()
-
-	value := ctx.Value(depFactoryKey)
-	if cfg, ok := value.(IDepFactory); ok {
-		return cfg
-	}
-
-	v := NewDepFactory()
-	ctx = context.WithValue(ctx, depFactoryKey, v)
-	cmd.SetContext(ctx)
-
-	return v
-}
 
 func (depFactory) Sources(cmd types.ICommand) error {
 	sources := map[types.SourceType]types.ISource{
@@ -113,6 +71,27 @@ func (depFactory) Config(cmd types.ICommand, icfg types.IConfig) error {
 	}
 
 	ctxu.SetConfig(cmd, cfg)
+
+	return nil
+}
+
+func (f depFactory) Libraries(cmd types.ICommand) error {
+	cfg, err := ctxu.GetConfig(cmd)
+	if err != nil {
+		return err
+	}
+
+	httpClient := ctxu.GetHttpClient(cmd)
+
+	libraries := map[types.LibraryType]types.ILibrary{}
+	for _, setting := range cfg.Libraries {
+		switch setting.Name {
+		case types.LibIBLibrary:
+			libraries[types.LibIBLibrary] = libib.New(setting, httpClient)
+		}
+	}
+
+	ctxu.SetLibraries(cmd, libraries)
 
 	return nil
 }

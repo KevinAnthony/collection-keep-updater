@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/kevinanthony/collection-keep-updater/library/libib"
+
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/di"
 	"github.com/kevinanthony/collection-keep-updater/source/viz"
@@ -92,7 +94,7 @@ func TestDepFactory_Config(t *testing.T) {
 		cmdCall := cmdMock.On("Context").Maybe()
 		ctxCall := ctx.On("Value", ctxu.ContextKey("sources_ctx_key")).Maybe()
 		sourceCall := source.On("SourceSettingFromConfig", settingMap).Maybe()
-		cmdMock.On("SetContext", mock.MatchedBy(matchFunc(expectedCfg))).Maybe()
+		cmdMock.On("SetContext", mock.MatchedBy(matchFunc("config_ctx_key", expectedCfg))).Maybe()
 
 		sources := map[types.SourceType]types.ISource{types.VizSource: source}
 
@@ -141,9 +143,9 @@ func TestDepFactory_Config(t *testing.T) {
 	})
 }
 
-func TestLoadDI(t *testing.T) {
+func TestDepFactory_Sources(t *testing.T) {
 	t.Parallel()
-	Convey("LoadSources", t, func() {
+	Convey("Sources", t, func() {
 		factory := di.NewDepFactory()
 
 		ctx := ctxu.NewContextMock(t)
@@ -167,42 +169,65 @@ func TestLoadDI(t *testing.T) {
 	})
 }
 
-func TestGetDIFactory(t *testing.T) {
+func TestDepFactory_Libraries(t *testing.T) {
 	t.Parallel()
 
-	Convey("GetDIFactory", t, func() {
+	Convey("Libraries", t, func() {
+		factory := di.NewDepFactory()
+
 		ctx := ctxu.NewContextMock(t)
 		cmdMock := types.NewICommandMock(t)
-		diMock := di.NewIDepFactoryMock(t)
+		clientMock := http.NewClientMock(t)
 
-		getCtxCall := cmdMock.On("Context").Once()
+		settings := types.LibrarySettings{
+			Name:        types.LibIBLibrary,
+			WantedColID: "id0",
+			OtherColIDs: []string{"id1", "id2", "id3"},
+			APIKey:      "secret",
+		}
+		libSettings := map[types.LibraryType]types.ILibrary{types.LibIBLibrary: libib.New(settings, clientMock)}
 
-		ctxCall := ctx.On("Value", ctxu.ContextKey("dep_factory_ctx_key")).Maybe()
+		getCall := cmdMock.On("Context").Return(ctx).Maybe()
+		setCall := cmdMock.On("SetContext", mock.MatchedBy(matchFunc("libraries_ctx_key", libSettings))).Maybe()
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(clientMock).Maybe()
+		getConfigCall := ctx.On("Value", ctxu.ContextKey("config_ctx_key")).Maybe()
 
-		Convey("should get this cfg from the context of the command", func() {
-			getCtxCall.Return(ctx)
-			ctxCall.Once().Return(diMock)
+		cfg := types.Config{
+			Libraries: []types.LibrarySettings{
+				{
+					APIKey:      "secret",
+					WantedColID: "id0",
+					OtherColIDs: []string{"id1", "id2", "id3"},
+					Name:        "libib",
+				},
+			},
+		}
 
-			actual := di.GetDIFactory(cmdMock)
+		Convey("should set source in context", func() {
+			getCall.Times(3)
+			setCall.Once().Return()
+			getConfigCall.Return(cfg, nil).Once()
 
-			So(actual, ShouldResemble, diMock)
+			err := factory.Libraries(cmdMock)
+
+			So(err, ShouldBeNil)
 		})
-		Convey("should return new viper when read is not in config", func() {
-			cmdMock.On("SetContext", mock.Anything)
+		Convey("should return error when", func() {
+			Convey("get config return error", func() {
+				getConfigCall.Return(nil, errors.New("get config error")).Once()
 
-			getCtxCall.Return(context.Background())
+				err := factory.Libraries(cmdMock)
 
-			actual := di.GetDIFactory(cmdMock)
-
-			So(actual, ShouldHaveSameTypeAs, di.NewDepFactory())
+				So(err, ShouldBeError, "configuration not found in context")
+			})
 		})
 	})
 }
 
-func matchFunc(expectedConfig types.Config) func(ctx context.Context) bool {
+func matchFunc(key string, expected any) func(ctx context.Context) bool {
 	return func(ctx context.Context) bool {
-		actualConfig := ctx.Value(ctxu.ContextKey("config_ctx_key"))
+		actual := ctx.Value(ctxu.ContextKey(key))
 
-		return reflect.DeepEqual(actualConfig, expectedConfig)
+		return reflect.DeepEqual(actual, expected)
 	}
 }
