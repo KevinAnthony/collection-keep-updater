@@ -1,8 +1,11 @@
 package updater_test
 
 import (
+	"context"
 	"errors"
 	"testing"
+
+	"github.com/stretchr/testify/mock"
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
@@ -18,6 +21,36 @@ func TestNewUpdater(t *testing.T) {
 		update := updater.NewUpdater()
 
 		So(update, ShouldNotBeNil)
+	})
+}
+
+func TestGetUpdater(t *testing.T) {
+	t.Parallel()
+	Convey("GetUpdater", t, func() {
+		ctx := ctxu.NewContextMock(t)
+		cmdMock := types.NewICommandMock(t)
+		updaterMock := updater.NewIUpdaterMock(t)
+
+		getCtxCall := cmdMock.On("Context").Once()
+		ctxCall := ctx.On("Value", ctxu.ContextKey("updater_ctx_key")).Maybe()
+
+		Convey("should return updater from context if set", func() {
+			getCtxCall.Return(ctx)
+			ctxCall.Once().Return(updaterMock)
+
+			actual := updater.GetUpdater(cmdMock)
+
+			So(actual, ShouldResemble, updaterMock)
+		})
+		Convey("should return new updater when read is not in context", func() {
+			cmdMock.On("SetContext", mock.Anything)
+
+			getCtxCall.Return(context.Background())
+
+			actual := updater.GetUpdater(cmdMock)
+
+			So(actual, ShouldNotBeNil)
+		})
 	})
 }
 
