@@ -91,7 +91,7 @@ func TestGetWikiGetter(t *testing.T) {
 
 		ctxCall := ctx.On("Value", ctxu.ContextKey("wiki_getter_ctx_key")).Maybe()
 
-		Convey("should get this cfg from the context of the command", func() {
+		Convey("should get this wiki from the context of the command", func() {
 			getCtxCall.Return(ctx)
 			ctxCall.Once().Return(wikiMock)
 

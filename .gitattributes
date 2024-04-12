@@ -1,0 +1,4 @@
+source/kodansha/test_fixtures/** linguist-vendored
+source/viz/test_fixtures/** linguist-vendored
+source/wikipedia/test_fixtures/** linguist-vendored
+source/yen/test_fixtures/** linguist-vendored
