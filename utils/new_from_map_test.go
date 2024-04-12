@@ -39,7 +39,7 @@ func TestNewLibraryFromMap(t *testing.T) {
 				settings, err := utils.NewLibraryFromMap(nil, []string{"omg", "hi"})
 
 				So(err, ShouldBeError, "data is not a library")
-				So(settings, ShouldBeNil)
+				So(settings, ShouldResemble, types.LibrarySettings{})
 			})
 		})
 	})
