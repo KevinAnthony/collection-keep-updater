@@ -3,6 +3,7 @@ package utils
 import (
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
+
 	"github.com/pkg/errors"
 )
 

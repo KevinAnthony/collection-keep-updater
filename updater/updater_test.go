@@ -5,13 +5,12 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/mock"
-
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/collection-keep-updater/updater"
 
 	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestNewUpdater(t *testing.T) {
