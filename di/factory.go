@@ -1,7 +1,6 @@
 package di
 
 import (
-	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/library/libib"
 	"github.com/kevinanthony/collection-keep-updater/source/kodansha"
@@ -9,6 +8,7 @@ import (
 	"github.com/kevinanthony/collection-keep-updater/source/wikipedia"
 	"github.com/kevinanthony/collection-keep-updater/source/yen"
 	"github.com/kevinanthony/collection-keep-updater/types"
+	"github.com/kevinanthony/collection-keep-updater/utils"
 )
 
 const (
@@ -52,7 +52,7 @@ func (depFactory) Config(cmd types.ICommand, icfg types.IConfig) error {
 
 	seriesSlice := icfg.Get("series").([]interface{})
 	for _, data := range seriesSlice {
-		series, err := config.GetSeries(cmd, data)
+		series, err := utils.NewSeriesFromMap(cmd, data)
 		if err != nil {
 			return err
 		}
@@ -62,7 +62,7 @@ func (depFactory) Config(cmd types.ICommand, icfg types.IConfig) error {
 
 	libSlice := icfg.Get("libraries").([]interface{})
 	for _, data := range libSlice {
-		library, err := config.GetLibrary(cmd, data)
+		library, err := utils.NewLibraryFromMap(cmd, data)
 		if err != nil {
 			return err
 		}

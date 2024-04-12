@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/kevinanthony/collection-keep-updater/config"
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/di"
 	"github.com/kevinanthony/collection-keep-updater/types"
@@ -34,7 +33,6 @@ func PreRunE(cmd types.ICommand) error {
 }
 
 func init() {
-	rootCmd.AddCommand(config.GetCmd())
 	rootCmd.AddCommand(updater.GetCmd())
 }
 

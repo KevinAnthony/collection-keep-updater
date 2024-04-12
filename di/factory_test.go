@@ -26,6 +26,8 @@ func TestDepFactory_Config(t *testing.T) {
 		cmdMock := types.NewICommandMock(t)
 		cfgMock := types.NewIConfigMock(t)
 		source := types.NewISouceMock(t)
+		cmd := types.NewICommandMock(t)
+		client := http.NewClientMock(t)
 
 		settingMap := map[string]any{
 			"delay_between":   "100ms",
@@ -49,8 +51,6 @@ func TestDepFactory_Config(t *testing.T) {
 				"type":                 "libib",
 			},
 		}
-		cmd := types.NewICommandMock(t)
-		client := http.NewClientMock(t)
 
 		cmd.On("Context").Return(ctx)
 		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)
