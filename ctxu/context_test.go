@@ -2,6 +2,7 @@ package ctxu_test
 
 import (
 	"context"
+	"reflect"
 	"testing"
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
@@ -66,17 +67,18 @@ func TestSetLibraries(t *testing.T) {
 	t.Parallel()
 
 	Convey("SetLibraries", t, func() {
-		ctx := context.Background()
-		httpMock := http.NewClientMock(t)
-		settings := types.LibrarySettings{Name: types.LibIBLibrary}
-
-		libSettings := map[types.LibraryType]types.ILibrary{types.LibIBLibrary: libib.New(settings, httpMock)}
-		expectedCtx := context.WithValue(context.Background(), ctxu.ContextKey("libraries_ctx_key"), libSettings)
+		ctx := ctxu.NewContextMock(t)
 		cmdMock := types.NewICommandMock(t)
+		clientMock := http.NewClientMock(t)
+
+		settings := types.LibrarySettings{Name: types.LibIBLibrary}
+		cmdMock.On("Context").Twice().Return(ctx)
+		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(clientMock).Maybe()
+
+		libSettings := map[types.LibraryType]types.ILibrary{types.LibIBLibrary: libib.New(cmdMock, settings)}
 
 		Convey("should set the cfg into the context of the command", func() {
-			cmdMock.On("Context").Once().Return(ctx)
-			cmdMock.On("SetContext", expectedCtx).Once()
+			cmdMock.On("SetContext", mock.MatchedBy(matchFunc("libraries_ctx_key", libSettings))).Once()
 
 			ctxu.SetLibraries(cmdMock, libSettings)
 		})
@@ -145,7 +147,7 @@ func TestGetSource(t *testing.T) {
 		cmdCall := cmdMock.On("Context").Once()
 		ctxCall := ctx.On("Value", ctxu.ContextKey("sources_ctx_key")).Maybe()
 
-		source := types.NewISouceMock(t)
+		source := types.NewISourceMock(t)
 		sources := map[types.SourceType]types.ISource{types.WikipediaSource: source}
 
 		Convey("should return source when source in context", func() {
@@ -189,7 +191,7 @@ func TestGetSourceSetting(t *testing.T) {
 		cmdCall := cmdMock.On("Context").Once()
 		ctxCall := ctx.On("Value", ctxu.ContextKey("sources_ctx_key")).Maybe()
 
-		source := types.NewISouceMock(t)
+		source := types.NewISourceMock(t)
 		sources := map[types.SourceType]types.ISource{types.WikipediaSource: source}
 
 		Convey("should return source when source in context", func() {
@@ -221,4 +223,12 @@ func TestGetSourceSetting(t *testing.T) {
 			})
 		})
 	})
+}
+
+func matchFunc(key string, expected any) func(ctx context.Context) bool {
+	return func(ctx context.Context) bool {
+		actual := ctx.Value(ctxu.ContextKey(key))
+
+		return reflect.DeepEqual(actual, expected)
+	}
 }

@@ -52,7 +52,7 @@ func TestNewSeriesFromMap(t *testing.T) {
 		cmd := types.NewICommandMock(t)
 		ctx := ctxu.NewContextMock(t)
 		client := http.NewClientMock(t)
-		source := types.NewISouceMock(t)
+		source := types.NewISourceMock(t)
 
 		cmd.On("Context").Return(ctx).Maybe()
 		ctx.On("Value", ctxu.ContextKey("http_ctx_key")).Return(client)

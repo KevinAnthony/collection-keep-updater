@@ -59,7 +59,7 @@ func TestUpdater_GetAllAvailableBooks(t *testing.T) {
 	Convey("GetAllAvailableBooks", t, func() {
 		ctx := ctxu.NewContextMock(t)
 		cmdMock := types.NewICommandMock(t)
-		sourceMock := types.NewISouceMock(t)
+		sourceMock := types.NewISourceMock(t)
 		update := updater.NewUpdater()
 
 		expected := types.ISBNBooks{{Title: "test vol 1", ISBN13: "test_1_isbn"}}

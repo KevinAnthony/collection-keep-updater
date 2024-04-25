@@ -35,12 +35,10 @@ func TestPreRunE(t *testing.T) {
 		ctx.On("Value", ctxu.ContextKey("config_loader_ctx_key")).Return(cfgLoader).Once()
 		ctx.On("Value", ctxu.ContextKey("dep_factory_ctx_key")).Return(factory).Once()
 		cfgCall := factory.On("Config", command, cfgLoader).Maybe()
-		srcCall := factory.On("Sources", command).Maybe()
 		libCall := factory.On("Libraries", command).Maybe()
 
 		Convey("should return no errors", func() {
 			cfgCall.Return(nil).Once()
-			srcCall.Return(nil).Once()
 			libCall.Return(nil).Once()
 
 			err := cmd.PreRunE(command)
@@ -55,17 +53,8 @@ func TestPreRunE(t *testing.T) {
 
 				So(err, ShouldBeError, "cfg error")
 			})
-			Convey("sources returns an error", func() {
-				cfgCall.Return(nil).Once()
-				srcCall.Return(errors.New("source error")).Once()
-
-				err := cmd.PreRunE(command)
-
-				So(err, ShouldBeError, "source error")
-			})
 			Convey("libraries returns an error", func() {
 				cfgCall.Return(nil).Once()
-				srcCall.Return(nil).Once()
 				libCall.Return(errors.New("lib error")).Once()
 
 				err := cmd.PreRunE(command)
