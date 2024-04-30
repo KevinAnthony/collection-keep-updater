@@ -15,7 +15,7 @@ type ILibrary interface {
 	SaveWanted(wanted ISBNBooks) error
 }
 
-//go:generate mockery --name=ISource --structname=ISouceMock --filename=source_mock.go --inpackage
+//go:generate mockery --name=ISource --structname=ISourceMock --filename=source_mock.go --inpackage
 type ISource interface {
 	GetISBNs(ctx context.Context, series Series) (ISBNBooks, error)
 	ISourceConfig

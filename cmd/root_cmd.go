@@ -25,10 +25,6 @@ func PreRunE(cmd types.ICommand) error {
 		return err
 	}
 
-	if err := factory.Sources(cmd); err != nil {
-		return err
-	}
-
 	return factory.Libraries(cmd)
 }
 

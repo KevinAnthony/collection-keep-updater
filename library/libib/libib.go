@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
 	"github.com/kevinanthony/gorps/v2/http"
 
@@ -21,13 +22,9 @@ type libIB struct {
 	client http.Client
 }
 
-func New(cfg types.LibrarySettings, c http.Client) types.ILibrary {
-	if c == nil {
-		panic("http client is nil")
-	}
-
+func New(cmd types.ICommand, cfg types.LibrarySettings) types.ILibrary {
 	return libIB{
-		client: c,
+		client: ctxu.GetHttpClient(cmd),
 		cfg:    cfg,
 	}
 }
@@ -47,10 +44,7 @@ func (l libIB) GetBooksInCollection(ctx context.Context) (types.ISBNBooks, error
 }
 
 func (l libIB) SaveWanted(wanted types.ISBNBooks) error {
-	outFile, err := os.Create(outFileName)
-	if err != nil {
-		return err
-	}
+	outFile, _ := os.Create(outFileName)
 
 	return gocsv.MarshalFile(l.createCSVEntries(wanted), outFile)
 }
@@ -83,7 +77,7 @@ func (l libIB) createCSVEntries(books types.ISBNBooks) []libibCSVEntries {
 }
 
 func (l libIB) getCSV(ctx context.Context, libraryID string) ([]libibCSVEntries, error) {
-	req, err := http.
+	req, _ := http.
 		NewRequest(l.client).
 		Post().
 		URL(exportURL).
@@ -91,9 +85,6 @@ func (l libIB) getCSV(ctx context.Context, libraryID string) ([]libibCSVEntries,
 		Header("Cookie", l.cfg.APIKey).
 		Header("Content-Type", "application/x-www-form-urlencoded").
 		CreateRequest(ctx)
-	if err != nil {
-		return nil, err
-	}
 
 	body, err := l.client.Do(req)
 	if err != nil {
