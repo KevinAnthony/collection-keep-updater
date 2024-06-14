@@ -39,13 +39,13 @@ func (_m *ILibraryMock) GetBooksInCollection(ctx context.Context) (ISBNBooks, er
 	return r0, r1
 }
 
-// SaveWanted provides a mock function with given fields: wanted
-func (_m *ILibraryMock) SaveWanted(wanted ISBNBooks) error {
-	ret := _m.Called(wanted)
+// SaveWanted provides a mock function with given fields: cmd, wanted
+func (_m *ILibraryMock) SaveWanted(cmd ICommand, wanted ISBNBooks) error {
+	ret := _m.Called(cmd, wanted)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(ISBNBooks) error); ok {
-		r0 = rf(wanted)
+	if rf, ok := ret.Get(0).(func(ICommand, ISBNBooks) error); ok {
+		r0 = rf(cmd, wanted)
 	} else {
 		r0 = ret.Error(0)
 	}

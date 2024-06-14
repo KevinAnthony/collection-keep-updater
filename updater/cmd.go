@@ -65,7 +65,7 @@ func Run(cmd types.ICommand) error {
 		case utils.GetFlagBool(cmd, printF):
 			wanted.Print(cmd)
 		case utils.GetFlagBool(cmd, writeF):
-			if err := library.SaveWanted(wanted); err != nil {
+			if err := library.SaveWanted(cmd, wanted); err != nil {
 				return err
 			}
 		}
