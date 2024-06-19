@@ -3,7 +3,6 @@ package libib
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/kevinanthony/collection-keep-updater/ctxu"
 	"github.com/kevinanthony/collection-keep-updater/types"
@@ -14,18 +13,21 @@ import (
 
 const (
 	exportURL   = "https://www.libib.com/settings/export-library/submit"
-	outFileName = "wanted.csv"
+	validateURL = "https://www.libib.com/csvimport/validate-file/submit"
+	processURL  = "https://www.libib.com/csvimport/process-import"
 )
 
 type libIB struct {
 	cfg    types.LibrarySettings
 	client http.Client
+	helper ILibibHelper
 }
 
 func New(cmd types.ICommand, cfg types.LibrarySettings) types.ILibrary {
 	return libIB{
 		client: ctxu.GetHttpClient(cmd),
 		cfg:    cfg,
+		helper: NewLibinHelper(cmd, cfg),
 	}
 }
 
@@ -43,10 +45,27 @@ func (l libIB) GetBooksInCollection(ctx context.Context) (types.ISBNBooks, error
 	return l.createISBNBook(libibEntries), nil
 }
 
-func (l libIB) SaveWanted(wanted types.ISBNBooks) error {
-	outFile, _ := os.Create(outFileName)
+func (l libIB) SaveWanted(cmd types.ICommand, wanted types.ISBNBooks) error {
+	results, err := l.helper.SubmitForm(cmd, wanted)
+	if err != nil {
+		return err
+	}
 
-	return gocsv.MarshalFile(l.createCSVEntries(wanted), outFile)
+	isbn, err := l.helper.GetISBNFromSuccessResult(cmd, results)
+	if err != nil {
+		return err
+	}
+
+	if err := l.helper.ValidateResults(cmd, wanted, isbn); err != nil {
+		return err
+	}
+
+	cols, err := l.helper.GetQueryParamsFromSuccessResults(cmd, results)
+	if err != nil {
+		return err
+	}
+
+	return l.helper.SaveResults(cmd, cols)
 }
 
 func (l libIB) createISBNBook(entries []libibCSVEntries) types.ISBNBooks {
@@ -60,20 +79,6 @@ func (l libIB) createISBNBook(entries []libibCSVEntries) types.ISBNBooks {
 	}
 
 	return books
-}
-
-func (l libIB) createCSVEntries(books types.ISBNBooks) []libibCSVEntries {
-	entries := make([]libibCSVEntries, 0, len(books))
-	for _, book := range books {
-		entry := libibCSVEntries{
-			ISBN13: book.ISBN13,
-			ISBN:   book.ISBN10,
-		}
-
-		entries = append(entries, entry)
-	}
-
-	return entries
 }
 
 func (l libIB) getCSV(ctx context.Context, libraryID string) ([]libibCSVEntries, error) {

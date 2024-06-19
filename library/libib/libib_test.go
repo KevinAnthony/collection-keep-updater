@@ -150,7 +150,7 @@ func TestLibIB_SaveWanted(t *testing.T) {
 
 		client := libib.New(cmd, settings)
 		Convey("should return valid collection of books", func() {
-			err := client.SaveWanted(expected)
+			err := client.SaveWanted(cmd, expected)
 
 			So(err, ShouldBeNil)
 		})
